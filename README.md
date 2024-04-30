@@ -2,7 +2,7 @@
 
 ## Description
 
-Bu proje , Spring Petclinic Mikro Hizmetler Uygulamasını kullanarak mikro hizmet tabanlı uygulamalar için tam CI/CD Pipeline oluşturmayı amaçlamaktadır . [Spring Petclinic Microservices Application](https://github.com/spring-petclinic/spring-petclinic-microservices). 
+Bu proje , Spring Petclinic Mikro Hizmetler Uygulamasını kullanarak mikro hizmet tabanlı uygulamalar için tam CI/CD Pipeline oluşturmayı amaçlamaktadır . [Spring Petclinic Microservices Application](https://github.com/spring-petclinic/spring-petclinic-htmx.git). 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 ##  AŞAMA 1 - Projemiz için GitHub Repository hazırlanması 
@@ -15,7 +15,7 @@ Bu proje , Spring Petclinic Mikro Hizmetler Uygulamasını kullanarak mikro hizm
 git clone https://github.com/yakin68/ozgur-yazilim-tasg.git 
 ```
 
-* [Spring Petclinic Microservices Application](https://github.com/spring-petclinic/spring-petclinic-microservices). reposuna bağlanıp Spring Petclinic Microservices Uygulamasını  oluşturduğumuz repomuza kopyalayalım . İsterseniz "fork" veya repoyu download yapabilirsiniz.  
+* [Spring Petclinic Microservices Application] (https://github.com/spring-petclinic/spring-petclinic-htmx.git. reposuna bağlanıp Spring Petclinic Microservices Uygulamasını  oluşturduğumuz repomuza kopyalayalım . İsterseniz "fork" veya repoyu download yapabilirsiniz.  
 
 * Burada dikkatedilmesi gereken uygulamayı kopyalarken "Spring Petclinic Microservices Application" reporundaki ".git" dizinini ve "git clone https://github.com/yakin68/ozgur-yazilim-tasg.git" locale clone yaparsanız buradaki ".git" dizinini silmek gerekir. Yoksa proje üzerinde hata alabilirsiniz. Projenin sizin olmasını ve üzerinde değişiklik yapmak istiyorsanız bunu yapmanız gerekir.
 
@@ -58,7 +58,10 @@ git push origin main
 * Test işlemi için sanal makineye bağlanalım (ister vscode veya aws console vs.) aşağıdaki komutu çalıştıralım.
   
 ``` bash  
-  docker-compose up 
+git clone https://github.com/spring-petclinic-htmx/spring-petclinic-htmx.git
+cd spring-petclinic-htmx
+./mvnw package
+java -jar target/*.jar
 '''
 
 * [Spring Petclinic Microservices Application] reposundaki readme.md incelediğimizde https://localhost:8080 ile görüntü alabileceksiniz. Buradaki localhost test için ayağa kaldırdığımız, EC2 instance public ip almanız gerekir. Görüntü alındıktan sonra komutu girelim.
@@ -66,173 +69,17 @@ git push origin main
 ``` bash  
   terraform destroy -auto-approve
 '''
-
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-##  3 - Maven Derleme Kurulumunu Kontrol Edin
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-
-* Projemiz maven prosesi olduğu için, maven wrapper dosyasını çalıştıracağız. Bu kapsamlı bir mavem değildir. Böylece her instance maven kurmak gerekmeyecek. Ayrıca uygulama reposundaki mvnw linux için,  mvnw.cmd ise windows için kullanılmaktadır. 
-
-
-* `JAR'ları local depoya yükleyelim. Bu işlem sırasında .M2 local reposu oluşacaktır. Böylece maven ihtiyaç duyduğu pluginleri local depoya indirir. 
-
-``` bash
-./mvnw clean install
 ```
 
-* "BUILD SUCCESS" gördüğünüzde başarılı şekilde maven kurulmuş olacaktır. 
-  
+* /infrastructure/jenkins-server klasöründeki terraform dosyalarını çalıştıralım. (Bu jenkin server için bir sanal makine ayağa kaldıracaktır.) 
 
-* Uygulamayı maven  ile paketlemek için ana dizinde `package-with-mvn-wrapper.sh` bir komut dosyası hazırlayalım. 
 
-``` bash
-./mvnw clean package
-```
-
-```
-```
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 ## MSP 6 - Prepare Dockerfiles for Microservices
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
-* Create `feature/msp-6` branch from `dev`.
 
-``` bash
-git checkout dev
-git branch feature/msp-6
-git checkout feature/msp-6
-```
-
-* Prepare a Dockerfile for the `admin-server` microservice with following content and save it under `spring-petclinic-admin-server`.
-
-``` Dockerfile
-FROM openjdk:11-jre
-ARG DOCKERIZE_VERSION=v0.6.1
-ARG EXPOSED_PORT=9090
-ENV SPRING_PROFILES_ACTIVE docker,mysql
-ADD https://github.com/jwilder/dockerize/releases/download/${DOCKERIZE_VERSION}/dockerize-alpine-linux-amd64-${DOCKERIZE_VERSION}.tar.gz dockerize.tar.gz
-RUN tar -xzf dockerize.tar.gz
-RUN chmod +x dockerize
-ADD ./target/*.jar /app.jar
-EXPOSE ${EXPOSED_PORT}
-ENTRYPOINT ["java", "-Djava.security.egd=file:/dev/./urandom","-jar","/app.jar"]
-```
-
-* Prepare a Dockerfile for the `api-gateway` microservice with the following content and save it under `spring-petclinic-api-gateway`.
-
-``` Dockerfile
-FROM openjdk:11-jre
-ARG DOCKERIZE_VERSION=v0.6.1
-ARG EXPOSED_PORT=8080
-ENV SPRING_PROFILES_ACTIVE docker,mysql
-ADD https://github.com/jwilder/dockerize/releases/download/${DOCKERIZE_VERSION}/dockerize-alpine-linux-amd64-${DOCKERIZE_VERSION}.tar.gz dockerize.tar.gz
-RUN tar -xzf dockerize.tar.gz
-RUN chmod +x dockerize
-ADD ./target/*.jar /app.jar
-EXPOSE ${EXPOSED_PORT}
-ENTRYPOINT ["java", "-Djava.security.egd=file:/dev/./urandom","-jar","/app.jar"]
-```
-
-* Prepare a Dockerfile for the `config-server` microservice with the following content and save it under `spring-petclinic-config-server`.
-
-``` Dockerfile
-FROM openjdk:11-jre
-ARG DOCKERIZE_VERSION=v0.6.1
-ARG EXPOSED_PORT=8888
-ENV SPRING_PROFILES_ACTIVE docker,mysql
-ADD https://github.com/jwilder/dockerize/releases/download/${DOCKERIZE_VERSION}/dockerize-alpine-linux-amd64-${DOCKERIZE_VERSION}.tar.gz dockerize.tar.gz
-RUN tar -xzf dockerize.tar.gz
-RUN chmod +x dockerize
-ADD ./target/*.jar /app.jar
-EXPOSE ${EXPOSED_PORT}
-ENTRYPOINT ["java", "-Djava.security.egd=file:/dev/./urandom","-jar","/app.jar"]
-```
-
-* Prepare a Dockerfile for the `customer-service` microservice with the following content and save it under `spring-petclinic-customer-service`.
-
-``` Dockerfile
-FROM openjdk:11-jre
-ARG DOCKERIZE_VERSION=v0.6.1
-ARG EXPOSED_PORT=8081
-ENV SPRING_PROFILES_ACTIVE docker,mysql
-ADD https://github.com/jwilder/dockerize/releases/download/${DOCKERIZE_VERSION}/dockerize-alpine-linux-amd64-${DOCKERIZE_VERSION}.tar.gz dockerize.tar.gz
-RUN tar -xzf dockerize.tar.gz
-RUN chmod +x dockerize
-ADD ./target/*.jar /app.jar
-EXPOSE ${EXPOSED_PORT}
-ENTRYPOINT ["java", "-Djava.security.egd=file:/dev/./urandom","-jar","/app.jar"]
-```
-
-* Prepare a Dockerfile for the `discovery-server` microservice with the following content and save it under `spring-petclinic-discovery-server`.
-
-``` Dockerfile
-FROM openjdk:11-jre
-ARG DOCKERIZE_VERSION=v0.6.1
-ARG EXPOSED_PORT=8761
-ENV SPRING_PROFILES_ACTIVE docker,mysql
-ADD https://github.com/jwilder/dockerize/releases/download/${DOCKERIZE_VERSION}/dockerize-alpine-linux-amd64-${DOCKERIZE_VERSION}.tar.gz dockerize.tar.gz
-RUN tar -xzf dockerize.tar.gz
-RUN chmod +x dockerize
-ADD ./target/*.jar /app.jar
-EXPOSE ${EXPOSED_PORT}
-ENTRYPOINT ["java", "-Djava.security.egd=file:/dev/./urandom","-jar","/app.jar"]
-```
-
-* Prepare a Dockerfile for the `hystrix-dashboard` microservice with the following content and save it under `spring-petclinic-hystrix-dashboard`.
-
-``` Dockerfile
-FROM openjdk:11-jre
-ARG DOCKERIZE_VERSION=v0.6.1
-ARG EXPOSED_PORT=7979
-ENV SPRING_PROFILES_ACTIVE docker,mysql
-ADD https://github.com/jwilder/dockerize/releases/download/${DOCKERIZE_VERSION}/dockerize-alpine-linux-amd64-${DOCKERIZE_VERSION}.tar.gz dockerize.tar.gz
-RUN tar -xzf dockerize.tar.gz
-RUN chmod +x dockerize
-ADD ./target/*.jar /app.jar
-EXPOSE ${EXPOSED_PORT}
-ENTRYPOINT ["java", "-Djava.security.egd=file:/dev/./urandom","-jar","/app.jar"]
-```
-
-* Prepare a Dockerfile for the `vets-service` microservice with the following content and save it under `spring-petclinic-vets-service`.
-
-``` Dockerfile
-FROM openjdk:11-jre
-ARG DOCKERIZE_VERSION=v0.6.1
-ARG EXPOSED_PORT=8083
-ENV SPRING_PROFILES_ACTIVE docker,mysql
-ADD https://github.com/jwilder/dockerize/releases/download/${DOCKERIZE_VERSION}/dockerize-alpine-linux-amd64-${DOCKERIZE_VERSION}.tar.gz dockerize.tar.gz
-RUN tar -xzf dockerize.tar.gz
-RUN chmod +x dockerize
-ADD ./target/*.jar /app.jar
-EXPOSE ${EXPOSED_PORT}
-ENTRYPOINT ["java", "-Djava.security.egd=file:/dev/./urandom","-jar","/app.jar"]
-```
-
-* Prepare a Dockerfile for the `visits-service` microservice with the following content and save it under `spring-petclinic-visits-service`.
-
-``` Dockerfile
-FROM openjdk:11-jre
-ARG DOCKERIZE_VERSION=v0.6.1
-ARG EXPOSED_PORT=8082
-ENV SPRING_PROFILES_ACTIVE docker,mysql
-ADD https://github.com/jwilder/dockerize/releases/download/${DOCKERIZE_VERSION}/dockerize-alpine-linux-amd64-${DOCKERIZE_VERSION}.tar.gz dockerize.tar.gz
-RUN tar -xzf dockerize.tar.gz
-RUN chmod +x dockerize
-ADD ./target/*.jar /app.jar
-EXPOSE ${EXPOSED_PORT}
-ENTRYPOINT ["java", "-Djava.security.egd=file:/dev/./urandom","-jar","/app.jar"]
-```
-
-* Commit the changes, then push the Dockerfiles to the remote repo.
-
-``` bash
-git add .
-git commit -m 'added Dockerfiles for microservices'
-git push --set-upstream origin feature/msp-6
-git checkout dev
-git merge feature/msp-6
-git push origin dev
 ```
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
