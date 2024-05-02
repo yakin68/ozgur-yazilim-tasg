@@ -111,6 +111,8 @@ pipeline {
             echo 'Deleting all local images'
             sh 'docker image prune -af'
             echo 'Delete the Image Repository on ECR'
+        }
+        failure {
             sh """
                 aws ecr delete-repository \
                   --repository-name ${APP_REPO_NAME} \
@@ -129,6 +131,7 @@ pipeline {
             echo "Delete existing key pair using AWS CLI"
             sh "aws ec2 delete-key-pair --region ${AWS_REGION} --key-name ${ANS_KEYPAIR}"
             sh "rm -rf ${ANS_KEYPAIR}"
+        }    
 
         }
     }
