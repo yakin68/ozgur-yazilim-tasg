@@ -15,7 +15,7 @@
 
   - name: deploy petclinic application
     shell: |
-      helm plugin install https://github.com/hypnoglow/helm-s3.git
+      helm plugin install https://github.com/hypnoglow/helm-s3.git || true
       kubectl create ns petclinic-dev
       kubectl delete secret regcred -n petclinic-dev || true
       kubectl create secret generic regcred -n petclinic-dev \
