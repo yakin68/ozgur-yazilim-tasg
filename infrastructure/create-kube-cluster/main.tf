@@ -55,7 +55,7 @@ resource "aws_iam_role" "ec2connect" {
 }
 EOF
 
-  managed_policy_arns = ["arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess"]
+  managed_policy_arns = ["arn:aws:iam::aws:policy/AmazonEC2FullAccess", "arn:aws:iam::aws:policy/IAMFullAccess", "arn:aws:iam::aws:policy/AmazonS3FullAccess", "arn:aws:iam::aws:policy/AWSCloudFormationFullAccess", "arn:aws:iam::aws:policy/AdministratorAccess"]
 }
 
 resource "aws_security_group" "tf-k8s-master-sec-gr" {
@@ -105,4 +105,10 @@ resource "aws_security_group" "tf-k8s-master-sec-gr" {
     to_port     = 0
     cidr_blocks = ["0.0.0.0/0"]
   }
+}
+
+output kube-master-ip {
+  value       = aws_instance.master.public_ip
+  sensitive   = false
+  description = "public ip of the kube-master"
 }

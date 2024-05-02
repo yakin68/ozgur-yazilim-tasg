@@ -99,6 +99,8 @@ pipeline {
                 sh "AWS_REGION=us-east-1 helm repo add stable-petclinicapp s3://petclinic-helm-charts-yakin/stable/myapp/ || true"
                 sh "helm package k8s/petclinic_chart"
                 sh "helm s3 push --force petclinic_chart-${BUILD_NUMBER}.tgz stable-petclinic"
+                sh "ansible --version"
+                sh "ansible-inventory --graph"
                 sh "envsubst < ansible/playbooks/dev-petclinic-deploy-template > ansible/playbooks/dev-petclinic-deploy.yaml"
                 sh "sleep 60"    
                 sh "ansible-playbook -i ./ansible/inventory/dev_stack_dynamic_inventory_aws_ec2.yaml ./ansible/playbooks/dev-petclinic-deploy.yaml"
