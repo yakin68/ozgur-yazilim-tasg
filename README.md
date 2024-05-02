@@ -2,29 +2,29 @@
 
 ## Description
 
-Bu proje , Spring Petclinic Mikro Hizmetler Uygulamasını kullanarak mikro hizmet tabanlı uygulamalar için tam CI/CD Pipeline oluşturmayı amaçlamaktadır . [Spring Petclinic Microservices Application](https://github.com/spring-petclinic/spring-petclinic-htmx.git). 
+This project aims to create full CI/CD Pipeline for microservices based applications using Spring Petclinic Microservices Application. [Spring Petclinic Microservices Application](https://github.com/spring-petclinic/spring-petclinic-htmx.git).
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-##  STEP 1 - Projemiz için GitHub Repository hazırlanması 
+##  STEP 1 - Prepair GitHub Repository for your proje 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 
-* ozgur-yazilim-tasg adında bir repo hazırlayalım. readme.md olmasın.
+* create a repo named ozgur-yazilim-tasg. No readme.md.
 
 ``` bash
 git clone https://github.com/yakin68/ozgur-yazilim-tasg.git 
 ```
 
-* [Spring Petclinic Microservices Application] (https://github.com/spring-petclinic/spring-petclinic-htmx.git. reposuna bağlanıp Spring Petclinic Microservices Uygulamasını  oluşturduğumuz repomuza kopyalayalım . İsterseniz "fork" veya repoyu download yapabilirsiniz.  
+* Connect to the [Spring Petclinic Microservices Application] (https://github.com/spring-petclinic/spring-petclinic-htmx.git. repo and copy the Spring Petclinic Microservices Application to the repo we created. If you want, you can "fork" or download the repo.
 
-* Burada dikkatedilmesi gereken uygulamayı kopyalarken "Spring Petclinic Microservices Application" reporundaki ".git" dizinini ve "git clone https://github.com/yakin68/ozgur-yazilim-tasg.git" locale clone yaparsanız buradaki ".git" dizinini silmek gerekir. Yoksa proje üzerinde hata alabilirsiniz. Projenin sizin olmasını ve üzerinde değişiklik yapmak istiyorsanız bunu yapmanız gerekir.
+* What should be taken into consideration here is to delete the ".git" directory in the "Spring Petclinic Microservices Application" report and the ".git" directory in the "git clone https://github.com/yakin68/ozgur-yazilim-tasg.git" locale clone when copying the application. must. Otherwise, you may receive errors on the project. You need to do this if you want the project to be yours and you want to make changes to it.
 
 ```bash
 cd ozgur-yazilim-tasg
 rm -rf .git
 ```
 
-*  Sonrasında her zaman sen kimsin sorusu sormasın diye aşağıdaki komutları terminalden girelim.
+*  Enter the following commands from the terminal so that it does not always ask who are you.
 
 ```bash
 git init  
@@ -44,18 +44,18 @@ git push origin main
 ##  STEP 2 - Terraform Dosyalarını Hazırlayın ve Uygulamayı manual test edelim. [ Bu adımı geçebilirsiniz.]
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
-* Microservis mimarisini hazırlamadan önce manuel olarak çalışıp- çalışmadığını kontrol etmek best-practice bir yöntemdir. Ayrıca uygulamanın reposundaki readme.md takip edebilirsiniz. Bunun için tasg de 2 sanal makine kurulması istenmiştir, 1 sanal makinede test işlemi için oluşturulduktan sonra silinecektir.  
+* Before preparing the microservice architecture, it is a best-practice method to manually check whether it works or not. You can also follow readme.md in the app's repo. For this purpose, 2 virtual machines were requested to be set up in the tag, 1 virtual machine will be deleted after it is created for testing.
 
-* (https://github.com/yakin68/ozgur-yazilim-tasg.git) reposunda terraform dosyaları 'infrastructure' altında hazırlanmıştır.
+* Terraform files are prepared under 'infrastructure' in the (https://github.com/yakin68/ozgur-yazilim-tasg.git) repo.
  
-* /infrastructure/test-of-petclinic klasöründeki terraform dosyalarını çalıştıralım. (Bu test için bir sanal makine ayağa kaldıracaktır.)
+* Run the terraform files in the /infrastructure/test-of-petclinic folder. (This will stand up a virtual machine for testing.)
    
 ``` bash  
   terraform init 
   terraform apply -auto-approve
 ```
 
-* Test işlemi için sanal makineye bağlanalım (ister vscode veya aws console vs.) aşağıdaki komutu çalıştıralım.
+* connect to the virtual machine (either vscode or aws console etc.) and run the command below for app testing
   
 ``` bash  
 git clone https://github.com/spring-petclinic-htmx/spring-petclinic-htmx.git
@@ -64,7 +64,7 @@ cd spring-petclinic-htmx
 java -jar target/*.jar
 ```
 
-* [Spring Petclinic Microservices Application] reposundaki readme.md incelediğimizde https://localhost:8080 ile görüntü alabileceksiniz. Buradaki localhost, test için ayağa kaldırdığımız, EC2 instance public ip almanız gerekir. Görüntü alındıktan sonra komutu girelim.
+* When we examine readme.md in the [Spring Petclinic Microservices Application] repo, you will be able to get images with https://localhost:8080. You need to get the localhost here, the EC2 instance public ip that we set up for testing. After the image is taken, let's enter the command.
 
 ``` bash  
   terraform destroy -auto-approve
@@ -75,7 +75,7 @@ java -jar target/*.jar
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 
-* /infrastructure/jenkins-server klasöründeki terraform dosyalarını çalıştıralım. (Bu jenkin server için bir sanal makine ayağa kaldıracaktır.) 
+* Run the terraform files in the /infrastructure/jenkins-server folder. (This will create a virtual machine for the jenkin server.)
 
 
 ``` bash  
