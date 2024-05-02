@@ -1,4 +1,4 @@
-- hosts: role_master
+- hosts: _kube_master
   tasks:
 
   - name: Create .docker folder
