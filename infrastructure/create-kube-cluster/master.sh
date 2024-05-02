@@ -42,6 +42,9 @@ sudo curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/
 chmod 700 get_helm.sh
 sudo ./get_helm.sh
 
-sudo apt-get install python3-boto3 python3-botocore -y
+sudo apt-get install python3-pip -y
+sudo pip3 install --upgrade pip
+sudo pip3 install boto3 botocore
+
 
 
