@@ -107,7 +107,21 @@ pipeline {
         always {
             echo 'Deleting all local images'
             sh 'docker image prune -af'
+            echo 'Delete the Image Repository on ECR'
+            sh """
+                aws ecr delete-repository \
+                  --repository-name ${APP_REPO_NAME} \
+                  --region ${AWS_REGION}\
+                  --force
+                """
+            echo 'Tear down the Kubernetes Cluster'
+            sh """
+            cd infrastructure/create-kube-cluster
+            terraform destroy -auto-approve -no-color
+            """
+            echo "Delete existing key pair using AWS CLI"
+            sh "aws ec2 delete-key-pair --region ${AWS_REGION} --key-name ${ANS_KEYPAIR}"
+            sh "rm -rf ${ANS_KEYPAIR}"
         }
-
     }
 }
