@@ -7,7 +7,7 @@ hostnamectl set-hostname jenkins-server
 # install git
 apt install git -y
 
-# install java 11
+# install java 17
 apt install fontconfig openjdk-17-jre -y
 
 # install jenkins
@@ -39,7 +39,20 @@ systemctl restart jenkins
 # install python 3
 apt install -y python3-pip python3-devel
 
+# install ansible
+pip3 install ansible
+
 # install boto3
 pip3 install boto3 botocore
+
+# install terraform
+wget https://releases.hashicorp.com/terraform/1.8.2/terraform_1.8.2_linux_amd64.zip
+unzip terraform_1.8.2_linux_amd64.zip -d /usr/local/bin
+
+# Install Helm version 3+ on Jenkins Server. Introduction to Helm. Helm Installation.
+curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
+chmod 700 get_helm.sh
+sudo ./get_helm.sh
+
 
 

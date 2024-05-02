@@ -5,7 +5,7 @@
 Bu proje , Spring Petclinic Mikro Hizmetler Uygulamasını kullanarak mikro hizmet tabanlı uygulamalar için tam CI/CD Pipeline oluşturmayı amaçlamaktadır . [Spring Petclinic Microservices Application](https://github.com/spring-petclinic/spring-petclinic-htmx.git). 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-##  AŞAMA 1 - Projemiz için GitHub Repository hazırlanması 
+##  STEP 1 - Projemiz için GitHub Repository hazırlanması 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 
@@ -41,19 +41,19 @@ git push origin main
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-##  AŞAMA 2 - Terraform Dosyalarını Hazırlayın ve Uygulamayı manual test edelim.
+##  STEP 2 - Terraform Dosyalarını Hazırlayın ve Uygulamayı manual test edelim. [ Bu adımı geçebilirsiniz.]
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
-* Microservis mimarisini hazırlamadan önce manuel olarak çalışıp- çalışmadığını kontrol etmek best-practice bir yöntemdir. Ayrıca uygulamanın reposundaki readme.md takip edebilirsiniz. Bunun için tasg de 2 sanal makine kurulması istenmiştir, 1 sanal makinede test işlemi için oluşturulduktan sonra silinecektir. 
+* Microservis mimarisini hazırlamadan önce manuel olarak çalışıp- çalışmadığını kontrol etmek best-practice bir yöntemdir. Ayrıca uygulamanın reposundaki readme.md takip edebilirsiniz. Bunun için tasg de 2 sanal makine kurulması istenmiştir, 1 sanal makinede test işlemi için oluşturulduktan sonra silinecektir.  
 
-* Terraform ile 3 sanal makine ayağa kaldıralım, (https://github.com/yakin68/ozgur-yazilim-tasg.git) reposunda terraform dosyaları 'infrastructure' altında hazırlanmıştır.
+* (https://github.com/yakin68/ozgur-yazilim-tasg.git) reposunda terraform dosyaları 'infrastructure' altında hazırlanmıştır.
  
 * /infrastructure/test-of-petclinic klasöründeki terraform dosyalarını çalıştıralım. (Bu test için bir sanal makine ayağa kaldıracaktır.)
    
 ``` bash  
   terraform init 
   terraform apply -auto-approve
-'''
+```
 
 * Test işlemi için sanal makineye bağlanalım (ister vscode veya aws console vs.) aşağıdaki komutu çalıştıralım.
   
@@ -62,419 +62,614 @@ git clone https://github.com/spring-petclinic-htmx/spring-petclinic-htmx.git
 cd spring-petclinic-htmx
 ./mvnw package
 java -jar target/*.jar
-'''
+```
 
-* [Spring Petclinic Microservices Application] reposundaki readme.md incelediğimizde https://localhost:8080 ile görüntü alabileceksiniz. Buradaki localhost test için ayağa kaldırdığımız, EC2 instance public ip almanız gerekir. Görüntü alındıktan sonra komutu girelim.
+* [Spring Petclinic Microservices Application] reposundaki readme.md incelediğimizde https://localhost:8080 ile görüntü alabileceksiniz. Buradaki localhost, test için ayağa kaldırdığımız, EC2 instance public ip almanız gerekir. Görüntü alındıktan sonra komutu girelim.
 
 ``` bash  
   terraform destroy -auto-approve
-'''
 ```
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+##  STEP 3 - install jenkins-server 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
 
 * /infrastructure/jenkins-server klasöründeki terraform dosyalarını çalıştıralım. (Bu jenkin server için bir sanal makine ayağa kaldıracaktır.) 
 
 
-
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-## MSP 6 - Prepare Dockerfiles for Microservices
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-
-
-```
-
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-## MSP 7 - Prepare Script for Building Docker Images
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-
-* Create `feature/msp-7` branch from `dev`.
-
-``` bash
-git checkout dev
-git branch feature/msp-7
-git checkout feature/msp-7
-```
-
-* Prepare a script to build the docker images and save it as `build-dev-docker-images.sh` under `petclinic-microservices-with-db` folder.
-
-``` bash
-./mvnw clean package
-docker build --force-rm -t "petclinic-admin-server:dev" ./spring-petclinic-admin-server
-docker build --force-rm -t "petclinic-api-gateway:dev" ./spring-petclinic-api-gateway
-docker build --force-rm -t "petclinic-config-server:dev" ./spring-petclinic-config-server
-docker build --force-rm -t "petclinic-customers-service:dev" ./spring-petclinic-customers-service
-docker build --force-rm -t "petclinic-discovery-server:dev" ./spring-petclinic-discovery-server
-docker build --force-rm -t "petclinic-hystrix-dashboard:dev" ./spring-petclinic-hystrix-dashboard
-docker build --force-rm -t "petclinic-vets-service:dev" ./spring-petclinic-vets-service
-docker build --force-rm -t "petclinic-visits-service:dev" ./spring-petclinic-visits-service
-docker build --force-rm -t "petclinic-grafana-server:dev" ./docker/grafana
-docker build --force-rm -t "petclinic-prometheus-server:dev" ./docker/prometheus
-```
-
-* Give execution permission to build-dev-docker-images.sh. 
-
-```bash
-chmod +x build-dev-docker-images.sh
-```
-
-* Build the images.
-
-```bash
-./build-dev-docker-images.sh
-```
-
-* Commit the changes, then push the new script to the remote repo.
-
-
-
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-## MSP 8 - Create Docker Compose File for Local Development
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-
-* Create `feature/msp-8` branch from `dev`.
-
-``` bash
-git checkout dev
-git branch feature/msp-8
-git checkout feature/msp-8
-```
-
-* Prepare docker compose file to deploy the application locally and save it as `docker-compose-local.yml` under `petclinic-microservices-with-db` folder.
-
-``` yaml
-version: '2'
-
-services: 
-  config-server:
-    image: petclinic-config-server:dev
-    container_name: config-server
-    mem_limit: 512M
-    ports: 
-      - 8888:8888
-
-  discovery-server:
-    image: petclinic-discovery-server:dev
-    container_name: discovery-server
-    mem_limit: 512M
-    ports: 
-      - 8761:8761
-    depends_on: 
-      - config-server
-    entrypoint: ["./dockerize", "-wait=tcp://config-server:8888", "-timeout=160s", "--", "java", "-Djava.security.egd=file:/dev/./urandom","-jar","/app.jar"]
-
-  customers-service:
-    image: petclinic-customers-service:dev
-    container_name: customers-service
-    mem_limit: 512M
-    ports:
-     - 8081:8081
-    depends_on: 
-     - config-server
-     - discovery-server
-    entrypoint: ["./dockerize", "-wait=tcp://discovery-server:8761", "-timeout=160s", "--", "java", "-Djava.security.egd=file:/dev/./urandom","-jar","/app.jar" ]
-  
-  visits-service:
-    image: petclinic-visits-service:dev
-    container_name: visits-service
-    mem_limit: 512M
-    ports:
-     - 8082:8082
-    depends_on: 
-     - config-server
-     - discovery-server
-    entrypoint: ["./dockerize", "-wait=tcp://discovery-server:8761", "-timeout=160s", "--", "java", "-Djava.security.egd=file:/dev/./urandom","-jar","/app.jar" ]
-  
-  vets-service:
-    image: petclinic-vets-service:dev
-    container_name: vets-service
-    mem_limit: 512M
-    ports:
-     - 8083:8083
-    depends_on: 
-     - config-server
-     - discovery-server
-    entrypoint: ["./dockerize", "-wait=tcp://discovery-server:8761", "-timeout=160s", "--", "java", "-Djava.security.egd=file:/dev/./urandom","-jar","/app.jar" ]
-  
-  api-gateway:
-    image: petclinic-api-gateway:dev
-    container_name: api-gateway
-    mem_limit: 512M
-    ports:
-     - 8080:8080
-    depends_on: 
-     - config-server
-     - discovery-server
-    entrypoint: ["./dockerize", "-wait=tcp://discovery-server:8761", "-timeout=160s", "--", "java", "-Djava.security.egd=file:/dev/./urandom","-jar","/app.jar" ]
-  
-  admin-server:
-    image: petclinic-admin-server:dev
-    container_name: admin-server
-    mem_limit: 512M
-    ports:
-     - 9090:9090
-    depends_on: 
-     - config-server
-     - discovery-server
-    entrypoint: ["./dockerize", "-wait=tcp://discovery-server:8761", "-timeout=160s", "--", "java", "-Djava.security.egd=file:/dev/./urandom","-jar","/app.jar" ]
-
-  hystrix-dashboard:
-    image: petclinic-hystrix-dashboard:dev
-    container_name: hystrix-dashboard
-    mem_limit: 512M
-    ports:
-     - 7979:7979
-    depends_on: 
-     - config-server
-     - discovery-server
-    entrypoint: ["./dockerize", "-wait=tcp://discovery-server:8761", "-timeout=160s", "--", "java", "-Djava.security.egd=file:/dev/./urandom","-jar","/app.jar" ]
-
-  tracing-server:
-    image: openzipkin/zipkin
-    container_name: tracing-server
-    mem_limit: 512M
-    ports:
-     - 9411:9411 
-  
-  grafana-server:
-    image: petclinic-grafana-server:dev
-    container_name: grafana-server
-    mem_limit: 256M
-    ports:
-    - 3000:3000
-
-  prometheus-server:
-    image: petclinic-prometheus-server:dev
-    container_name: prometheus-server
-    mem_limit: 256M
-    ports:
-    - 9091:9090
-
-  mysql-server:
-    image: mysql:5.7.8
-    container_name: mysql-server
-    environment: 
-      MYSQL_ROOT_PASSWORD: petclinic
-      MYSQL_DATABASE: petclinic
-    mem_limit: 256M
-    ports:
-    - 3306:3306
-```
-
-* Prepare a script to test the deployment of the app locally with `docker-compose-local.yml` and save it as `test-local-deployment.sh` under `petclinic-microservices-with-db` folder.
-
-``` bash
-docker-compose -f docker-compose-local.yml up
-```
-
-* Give execution permission to test-local-deployment.sh.
-
-```bash
-chmod +x test-local-deployment.sh
-```
-
-* Execute the docker compose.
-
-```bash
-./test-local-deployment.sh
-```
-
-* Commit the change, then push the docker compose file to the remote repo.
-
-``` bash
-git add .
-git commit -m 'added docker-compose file and script for local deployment'
-git push --set-upstream origin feature/msp-8
-git checkout dev
-git merge feature/msp-8
-git push origin dev
-```
-
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-## MSP 9 - Prepare Jenkins Server for CI/CD Pipeline
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-
-* Create `feature/msp-9` branch from `dev`.
-
-``` bash
-git checkout dev
-git branch feature/msp-9
-git checkout feature/msp-9
-```
-
-* Set up a Jenkins Server and enable it with `Git`,  `Docker`,  `Docker Compose`,  `AWS CLI v2`, `Python`,  `Terraform`, `Ansible` and `Boto3`.  To do so, prepare a [Terraform file for Jenkins Server](./jenkins-server-tf-template) with following scripts (jenkins_variables.tf, jenkins-server.tf, jenkins.auto.tf.vars, jenkinsdata.sh) and save them under `infrastructure` folder.
-
-``` bash
-#! /bin/bash
-# update os
-dnf update -y
-# set server hostname as jenkins-server
-hostnamectl set-hostname jenkins-server
-# install git
-dnf install git -y
-# install java 11
-dnf install java-11-amazon-corretto -y
-# install jenkins
-wget -O /etc/yum.repos.d/jenkins.repo https://pkg.jenkins.io/redhat-stable/jenkins.repo
-rpm --import https://pkg.jenkins.io/redhat-stable/jenkins.io-2023.key
-dnf upgrade
-dnf install jenkins -y
-systemctl enable jenkins
-systemctl start jenkins
-# install docker
-dnf install docker -y
-systemctl start docker
-systemctl enable docker
-usermod -a -G docker ec2-user
-usermod -a -G docker jenkins
-# configure docker as cloud agent for jenkins
-cp /lib/systemd/system/docker.service /lib/systemd/system/docker.service.bak
-sed -i 's/^ExecStart=.*/ExecStart=\/usr\/bin\/dockerd -H tcp:\/\/127.0.0.1:2376 -H unix:\/\/\/var\/run\/docker.sock/g' /lib/systemd/system/docker.service
-systemctl daemon-reload
-systemctl restart jenkins
-# install docker compose
-curl -SL https://github.com/docker/compose/releases/download/v2.17.3/docker-compose-linux-x86_64 -o /usr/local/bin/docker-compose
-chmod +x /usr/local/bin/docker-compose
-# install python 3
-dnf install -y python3-pip python3-devel
-# install ansible
-pip3 install ansible
-# install boto3
-pip3 install boto3 botocore
-# install terraform
-wget https://releases.hashicorp.com/terraform/1.4.6/terraform_1.4.6_linux_amd64.zip
-unzip terraform_1.4.6_linux_amd64.zip -d /usr/local/bin
-```
-
-* Commit the change, then push the terraform files file to the remote repo.
-
-``` bash
-git add .
-git commit -m 'added jenkins server terraform files'
-git push --set-upstream origin feature/msp-9
-git checkout dev
-git merge feature/msp-9
-git push origin dev
-```
-
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-## MSP 10 - Configure Jenkins Server for Project
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-
-* Launch the jenkins server using `msp-9-jenkins-server-tf-template` folder.
-
-* After launch we will go on jenkins server. So, clone the project repo to the jenkins server.
-
-```bash
-git clone https://[github username]:[your-token]@github.com/[your-git-account]/[your-repo-name-petclinic-microservices-with-db.git
+``` bash  
+  terraform init 
+  terraform apply -auto-approve
 ```
 
 * Get the initial administrative password.
-
-``` bash
 sudo cat /var/lib/jenkins/secrets/initialAdminPassword
-```
-
 * Enter the temporary password to unlock the Jenkins.
 
 * Install suggested plugins.
 
 * Create first admin user.
 
-* Open your Jenkins dashboard and navigate to `Manage Jenkins` >> `Plugins` >> `Available Plugins` tab
+* Open your Jenkins dashboard and navigate to Manage Jenkins >> Plugins >> Available tab
 
-* Search and select `GitHub Integration`,  `Docker`,  `Docker Pipeline`, and `Jacoco` plugins, then click `Install without restart`. Note: No need to install the other `Git plugin` which is already installed can be seen under `Installed` tab.
+* Search and select GitHub Integration, Docker, Docker Pipeline, Email Extension plugins, then click Install without restart. Note: No need to install the other Git plugin which is already installed can be seen under Installed tab.
+
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-## MSP 11 - Setup Unit Tests and Configure Code Coverage Report
+## STEP 4 - Prepare Dockerfiles for Microservices 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+* Prepare a Dockerfile file in the main directory.
 
 ```
+FROM amazoncorretto:17-alpine3.18
+WORKDIR /app
+COPY ./target/*.jar /app.jar
+ENV SPRING_PROFILES_ACTIVE mysql
+EXPOSE 8080
+ENTRYPOINT ["java", "-Djava.security.egd=file:/dev/./urandom","-jar","/app.jar"]
 ```
+
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-## MSP 12 - Prepare Continuous Integration (CI) Pipeline
+## STEP 5 -Prepare Automation Pipeline [environment]
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
-* Create `feature/msp-12` branch from `dev`.
+* Prepare environment, S3 bucket for HELM , Create ECR Repo for store, manage, and distribute Docker container images and save it under `jenkinsfile` file. 
+
+```
+pipeline {
+    agent any
+    environment {
+        APP_NAME="petclinic"
+        APP_REPO_NAME="ozgur-yazilim-repo/${APP_NAME}"
+        AWS_ACCOUNT_ID=sh(script:'aws sts get-caller-identity --query Account --output text', returnStdout:true).trim()
+        AWS_REGION="us-east-1"
+        ECR_REGISTRY="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
+        ANS_KEYPAIR="petclinic-${APP_NAME}-${BUILD_NUMBER}.key"
+        ANSIBLE_PRIVATE_KEY_FILE="${WORKSPACE}/${ANS_KEYPAIR}"
+        ANSIBLE_HOST_KEY_CHECKING="False"
+    }
+```
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+## STEP 5 -Prepare Automation Pipeline [Check S3 Bucket]
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+    stages {    
+        stage('Check S3 Bucket') {
+            steps {
+                script {
+                    try {
+                        sh 'aws s3api head-bucket --bucket petclinic-helm-charts-yakin --region us-east-1'
+                        echo 'Bucket already exists'
+                    } catch (Exception e) {
+                        echo 'Bucket does not exist. Creating...'
+                        sh 'aws s3api create-bucket --bucket petclinic-helm-charts-yakin --region us-east-1'
+                        sh 'aws s3api put-object --bucket petclinic-helm-charts-yakin --key stable/myapp/'
+                    }
+                }
+            }
+        }  
+```
+```
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+## STEP 5 -Prepare Automation Pipeline [Create ECR Repo]
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+        stage('Create ECR Repo') {
+            steps {
+                echo "Creating ECR Repo for ${APP_NAME} app"
+                sh '''
+                aws ecr describe-repositories --region ${AWS_REGION} --repository-name ${APP_REPO_NAME} || \
+                         aws ecr create-repository \
+                         --repository-name ${APP_REPO_NAME} \
+                         --image-scanning-configuration scanOnPush=true \
+                         --image-tag-mutability MUTABLE \
+                         --region ${AWS_REGION}
+                '''
+            }
+        }          
+    }
+}    
+```    
+```
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+## STEP 5 -Prepare Automation Pipeline [build,push and tags for docker images]
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+* Prepare a script to ``package`` the app with maven Docker container and save it as `package-with-maven-container.sh` and save it under `jenkins` folder.
+
+```bash
+docker run --rm -v $HOME/.m2:/root/.m2 -v $WORKSPACE:/app -w /app maven:3.9.5-amazoncorretto-17 mvn clean package
+```
+* Give execution permission to package-with-maven-container.sh
+```bash
+chmod +x package-with-maven-container.sh
+```
+
+* Prepare a stage to create ``ECR tags`` for docker images and save it as and save it under `jenkinsfile` file.
+
+```
+        stage('Prepare Tags for Docker Images') {
+            steps {
+                echo 'Preparing Tags for Docker Images'
+                script {
+                    MVN_VERSION=sh(script:'. ${WORKSPACE}/target/maven-archiver/pom.properties && echo $version', returnStdout:true).trim()
+                    env.IMAGE_TAG_PETCLINIC="${ECR_REGISTRY}/${APP_REPO_NAME}:yakin-petclinic-v${MVN_VERSION}-b${BUILD_NUMBER}"
+                }
+            }
+        }
+```
+
+* Prepare a script to build the dev docker images tagged for ECR registry and save it as `build-prod-docker-images-for-ecr.sh` and save it under `jenkins` folder. 
 
 ``` bash
-git checkout dev
-git branch feature/msp-12
-git checkout feature/msp-12
+docker build --force-rm -t "${IMAGE_TAG_PETCLINIC}" .
+```
+* Give execution permission to build-prod-docker-images-for-ecr.sh
+```bash
+chmod +x build-prod-docker-images-for-ecr.sh
 ```
 
-* Create a folder, named `jenkins`, to keep `Jenkinsfiles` and `Jenkins jobs` of the project.
+* Prepare a script to push the dev docker images to the ECR repo and save it as `push-prod-docker-images-to-ecr.sh` and save it under `jenkins` folder.
 
-``` bash
-mkdir jenkins
+```bash
+# Provide credentials for Docker to login the AWS ECR and push the images
+aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ECR_REGISTRY} 
+docker push "${IMAGE_TAG_ADMIN_SERVER}"
 ```
-* Create a ``Jenkins job`` Running Unit Tests on Petclinic Application
-
-```yml
-- job name: petclinic-ci-job
-- job type: Freestyle project
-- GitHub project: https://github.com/[your-github-account]/petclinic-microservices
-- Source Code Management: Git
-      Repository URL: https://github.com/[your-github-account]/petclinic-microservices.git
-- Branches to build:
-      Branch Specifier (blank for 'any'): - */dev 
-                                          - */feature**
-                                          - */bugfix**
-- Build triggers: GitHub hook trigger for GITScm polling
-- Build Environment: Add timestamps to the Console Output
-- Build:
-      Add build step: Execute Shell
-      Command:
-              echo 'Running Unit Tests on Petclinic Application'
-              docker run --rm -v $HOME/.m2:/root/.m2 -v `pwd`:/app -w /app maven:3.8-openjdk-11 mvn clean test
-- Post-build Actions:
-     Add post-build action: Record jacoco coverage report
+* Give execution permission to push-prod-docker-images-to-ecr.sh
+```bash
+chmod +x push-prod-docker-images-to-ecr.sh
 ```
 
-* Jenkins `CI Job` should be triggered to run on each commit of `feature**` and `bugfix**` branches and on each `PR` merge to `dev` branch.
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+## STEP 5 - STEP 5 -Prepare Automation Pipeline [Create Key Pair for Ansible]
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
-* Prepare a script for Jenkins CI job (covering Unit Test only) and save it as `jenkins-petclinic-ci-job.sh` under `jenkins` folder.
-
-``` bash
-echo 'Running Unit Tests on Petclinic Application'
-docker run --rm -v $HOME/.m2:/root/.m2 -v `pwd`:/app -w /app maven:3.8-openjdk-11 mvn clean test
+* Create Key Pair for Ansible
 ```
-
-* Create a webhook for Jenkins CI Job; 
-
-  + Go to the project repository page and click on `Settings`.
-
-  + Click on the `Webhooks` on the left hand menu, and then click on `Add webhook`.
-
-  + Copy the Jenkins URL, paste it into `Payload URL` field, add `/github-webhook/` at the end of URL, and click on `Add webhook`.
+        stage('Create Key Pair for Ansible') {
+            steps {
+                echo "Creating Key Pair for ${APP_NAME} App"
+                sh "aws ec2 create-key-pair --region ${AWS_REGION} --key-name ${ANS_KEYPAIR} --query KeyMaterial --output text > ${ANS_KEYPAIR}"
+                sh "chmod 400 ${ANS_KEYPAIR}"
+            }
+        }
+```
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+## STEP 5 - STEP 5 -Prepare Automation Pipeline [Create Infrastructure Kubernetes Cluster]
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+* Prepare a terraform file for kubernetes Infrastructure consisting of master server,  and save it as `main.tf` and `master.sh` under the `infrastructure/create-kube-cluster
   
-  ``` yml
-  http://[jenkins-server-hostname]:8080/github-webhook/
-  ```
+```go for main.tf
+provider "aws" {
+  region  = "us-east-1"
+}
 
-* Commit the change, then push the Jenkinsfile to the remote repo.
+data "aws_caller_identity" "current" {}
 
-``` bash
-git add .
-git commit -m 'added Jenkins Job for CI pipeline'
-git push --set-upstream origin feature/msp-12
-git checkout dev
-git merge feature/msp-12
-git push origin dev
+data "aws_region" "current" {}
+
+locals {
+  # change here, optional
+  name = "ozguryazilim"
+  keyname = "yaksonkey"
+  instancetype = "t3a.medium"
+  ami = "ami-0e001c9271cf7f3b9"
+}
+
+resource "aws_instance" "master" {
+  ami                  = local.ami
+  instance_type        = local.instancetype
+  key_name             = local.keyname
+  iam_instance_profile = aws_iam_instance_profile.ec2connectprofile.name
+  user_data            = file("master.sh")
+  vpc_security_group_ids = [aws_security_group.tf-k8s-master-sec-gr.id]
+  availability_zone = "us-east-1a"
+  tags = {
+    Name = "kube-master"
+    Project = "kube-ansible"
+    Role = "master"
+    Id = "1"
+    environment = "ozgur-yazilim"
+  }
+}
+
+
+resource "aws_iam_instance_profile" "ec2connectprofile" {
+  name = "ec2connectprofile-${local.name}"
+  role = aws_iam_role.ec2connect.name
+}
+
+resource "aws_iam_role" "ec2connect" {
+  name = "ec2connect-${local.name}"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Sid    = ""
+        Principal = {
+          Service = "ec2.amazonaws.com"
+        }
+      },
+    ]
+  })
+}
+
+resource "aws_security_group" "tf-k8s-master-sec-gr" {
+  name = "${local.name}-k8s-master-sec-gr"
+  tags = {
+    Name = "${local.name}-k8s-master-sec-gr"
+  }
+
+  ingress {
+    from_port = 0
+    protocol  = "-1"
+    to_port   = 0
+    self = true
+  }
+
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    from_port   = 30000
+    to_port     = 32767
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port   = 0
+    protocol    = "-1"
+    to_port     = 0
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+```
+
+```go for master.sh
+#! /bin/bash
+apt-get update -y
+apt-get upgrade -y
+hostnamectl set-hostname kube-master
+sudo apt-get install -y apt-transport-https ca-certificates curl gpg
+curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.29/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.29/deb/ /' | sudo tee /etc/apt/sources.list.d/kubernetes.list
+apt-get update
+apt-get install -y kubelet=1.29.0-1.1 kubeadm=1.29.0-1.1 kubectl=1.29.0-1.1 kubernetes-cni docker.io
+apt-mark hold kubelet kubeadm kubectl
+systemctl start docker
+systemctl enable docker
+usermod -aG docker ubuntu
+newgrp docker
+cat <<EOF | sudo tee /etc/modules-load.d/k8s.conf
+overlay
+br_netfilter
+EOF
+modprobe overlay
+modprobe br_netfilter
+cat <<EOF | sudo tee /etc/sysctl.d/k8s.conf
+net.bridge.bridge-nf-call-iptables  = 1
+net.bridge.bridge-nf-call-ip6tables = 1
+net.ipv4.ip_forward                 = 1
+EOF
+sysctl --system
+mkdir /etc/containerd
+containerd config default | tee /etc/containerd/config.toml >/dev/null 2>&1
+sed -i 's/SystemdCgroup \= false/SystemdCgroup \= true/g' /etc/containerd/config.toml
+systemctl restart containerd
+systemctl enable containerd
+kubeadm config images pull
+kubeadm init --pod-network-cidr=10.244.0.0/16 --ignore-preflight-errors=All
+mkdir -p /home/ubuntu/.kube
+cp -i /etc/kubernetes/admin.conf /home/ubuntu/.kube/config
+chown ubuntu:ubuntu /home/ubuntu/.kube/config
+su - ubuntu -c 'kubectl apply -f https://github.com/coreos/flannel/raw/master/Documentation/kube-flannel.yml'
+su - ubuntu -c 'kubectl apply -f https://raw.githubusercontent.com/rancher/local-path-provisioner/v0.0.26/deploy/local-path-storage.yaml'
+sudo -i -u ubuntu kubectl patch storageclass local-path -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}'
+
+sudo curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
+chmod 700 get_helm.sh
+sudo ./get_helm.sh
 ```
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-## MSP 13 - Prepare and Implement Selenium Tests
-
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-## MSP 14 - Create Docker Registry for Dev Manually
+## STEP 5 - STEP 5 -Prepare Automation Pipeline [Create Infrastructure Kubernetes Cluster]
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
-- Create `feature/msp-14` branch from `dev`.
-
-``` bash
-git checkout dev
-git branch feature/msp-14
-git checkout feature/msp-14
+* Create Infrastructure Kubernetes Cluster and Deploy App on Kubernetes cluster'
 ```
+        stage('Create Infrastructure Kubernetes Cluster ') {
+            steps {
+                echo 'Creating QA Automation Infrastructure for Dev Environment'
+                sh """
+                    cd infrastructure/create-kube-cluster
+                    sed -i "s/yaksonkey/$ANS_KEYPAIR/g" main.tf
+                    terraform init
+                    terraform apply -auto-approve -no-color
+                """
+                script {
+                    echo "Kubernetes Master is not UP and running yet."
+                    env.id = sh(script: 'aws ec2 describe-instances --filters Name=tag-value,Values=master Name=tag-value,Values=tera-kube-ans Name=instance-state-name,Values=running --query Reservations[*].Instances[*].[InstanceId] --output text',  returnStdout:true).trim()
+                    sh 'aws ec2 wait instance-status-ok --instance-ids $id'
+                }
+            }
+        }
+```
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+## STEP 5 - STEP 5 -Prepare Automation Pipeline [Create Helm chart]
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+* Create an helm chart named `petclinic_chart` under `k8s` folder.
+```bash
+cd k8s
+helm create petclinic_chart
+```
+* Add `k8s/petclinic_chart/values-template.yaml` file as below.
+```yaml for values-template.yaml
+IMAGE_TAG_PETCLINIC: "${IMAGE_TAG_PETCLINIC}"
+DNS_NAME: "www.devopsturkiye.store"
+```
+* In ``Chart.yaml``, ``set`` the `version` value(0.1.0) to `HELM_VERSION` in Chart.yaml for automation in jenkins pipeline.
+
+* Remove all files under the petclinic_chart/templates folder.
+```bash
+rm -r petclinic_chart/templates/*
+
+* Create yaml files under 'petclinic_chart/templates/' folder for keeping the manifest files of Petclinic App on Kubernetes cluster.
+```
+
+```yaml for petclinic-deploy.yml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: petclinic-deploy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: petclinic
+  template:
+    metadata:
+      labels:
+        app: petclinic
+    spec:
+      containers:
+      - name: petclinic
+        image: '{{ .Values.IMAGE_TAG_PETCLINIC }}'
+        ports:
+        - containerPort: 8080
+        resources:
+          requests:
+            cpu: 400m
+            memory: 400Mi
+          limits:
+            cpu: 500m
+            memory: 500Mi
+      imagePullSecrets:
+        - name: regcred
+      initContainers:
+        - name: init-mysql
+          image: busybox:latest
+          command: ['sh', '-c', 'until nc -z mysql-server:3306; do echo waiting for mysql-server; sleep 2; done;']
+          resources:
+            requests:
+              cpu: 200m
+              memory: 200Mi
+            limits:
+              cpu: 300m
+              memory: 300Mi
+```
+```yaml for petclinic-service.yml
+apiVersion: v1
+kind: Service
+metadata:
+  name: petclinic-service
+  labels:
+    name: petclinic
+spec:
+  selector:
+    app: petclinic
+  ports:
+  - port: 8080
+    targetPort: 8080
+
+```yaml for mysql-deploy.yml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql-deploy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mysql-db
+  template:
+    metadata:
+      labels:
+        app: mysql-db
+    spec:
+      containers:
+      - name: mysql-db
+        image: mysql:8.2
+        ports:
+        - containerPort: 3306
+        envFrom:
+        - secretRef:
+            name: mysql-secret
+        - configMapRef:
+            name: mysql-cm
+
+```yaml for mysql-service.yml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: mysql-secret
+stringData:
+  MYSQL_ROOT_PASSWORD: root
+  MYSQL_PASSWORD: petclinic
+
+```yaml for mysql-configmap.yml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mysql-cm
+data:
+    MYSQL_USER: "petclinic"
+    MYSQL_DATABASE: "petclinic"
+
+```yaml for mysql-secret.yml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: mysql-secret
+stringData:
+  MYSQL_ROOT_PASSWORD: root
+  MYSQL_PASSWORD: petclinic
+  
+```yaml for ingress.yml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: api-gateway
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: '{{ .Values.DNS_NAME }}'
+      http:
+        paths:
+          - backend:
+              service:
+                name: petclinic-service
+                port:
+                  number: 8080
+            path: /
+            pathType: Prefix
+status:
+  loadBalancer: {}
+```
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+## STEP 5 - Prepare Automation Pipeline [Create Ansible jobs]
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+* Create a folder for ansible jobs under the `main` folder.
+
+```bash
+mkdir -p ansible/inventory
+```
+
+* Prepare dynamic inventory file with name of `dev_stack_dynamic_inventory_aws_ec2.yaml` for Ansible under `ansible/inventory` folder using ec2 instances private IP addresses.
+
+```yaml
+plugin: aws_ec2
+regions:
+  - "us-east-1"
+filters:
+  tag:Project: kube-ansible
+  tag:environment: ozgur-yazilim
+  instance-state-name: running
+keyed_groups:
+  - key: tags['Project']
+    prefix: 'all_instances'
+  - key: tags['Role']
+    prefix: 'role'
+hostnames:
+  - "ip-address"
+compose:
+  ansible_user: "'ubuntu'"
+```
+
+* Create Ansible playbook for deploying application as `dev-petclinic-deploy-template` under `ansible/playbooks` folder.
+```yaml
+- hosts: role_master
+  tasks:
+
+  - name: Create .docker folder
+    file:
+      path: /home/ubuntu/.docker
+      state: directory
+      mode: '0755'
+
+  - name: copy the docker config file
+    become: yes
+    copy: 
+      src: $JENKINS_HOME/.docker/config.json
+      dest: /home/ubuntu/.docker/config.json
+
+  - name: deploy petclinic application
+    shell: |
+      helm plugin install https://github.com/hypnoglow/helm-s3.git
+      kubectl create ns petclinic-dev
+      kubectl delete secret regcred -n petclinic-dev || true
+      kubectl create secret generic regcred -n petclinic-dev \
+        --from-file=.dockerconfigjson=/home/ubuntu/.docker/config.json \
+        --type=kubernetes.io/dockerconfigjson
+      AWS_REGION=$AWS_REGION helm repo add stable-petclinic s3://petclinic-helm-charts-yakin/stable/myapp/
+      AWS_REGION=$AWS_REGION helm repo update
+      AWS_REGION=$AWS_REGION helm upgrade --install \
+        petclinic-app-release stable-petclinic/petclinic_chart --version ${BUILD_NUMBER} \
+        --namespace petclinic-dev
+```
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+## STEP 5 - Prepare Automation Pipeline [Deploying App on Kubernetes]
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #        
+        stage('Deploy App on Kubernetes cluster'){
+            steps {
+                echo 'Deploying App on Kubernetes'
+                sh "envsubst < k8s/petclinic_chart/values-template.yaml > k8s/petclinic_chart/values.yaml"
+                sh "sed -i s/HELM_VERSION/${BUILD_NUMBER}/ k8s/petclinic_chart/Chart.yaml"
+                sh "helm repo add stable-petclinic s3://petclinic-helm-charts-yakin/stable/myapp/"
+                sh "helm package k8s/petclinic_chart"
+                sh "helm s3 push --force petclinic_chart-${BUILD_NUMBER}.tgz stable-petclinic"
+                sh "envsubst < ansible/playbooks/dev-petclinic-deploy-template > ansible/playbooks/dev-petclinic-deploy.yaml"
+                sh "sleep 60"    
+                sh "ansible-playbook -i ./ansible/inventory/dev_stack_dynamic_inventory_aws_ec2.yaml ./ansible/playbooks/dev-petclinic-deploy.yaml"
+            }
+        }        
+```
+```
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+## STEP 12 - Deleting all local images and Send to mail success
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+    post {
+        always {
+            echo 'Deleting all local images'
+            sh 'docker image prune -af'
+        }
+
+        success {
+            mail bcc: '', body: 'Congrats !!! CICD Pipeline is successfull.', cc: '', from: '', replyTo: '', subject: 'Test Mail', to: 'yakin68@gmail.com'
+            }
+    }
+
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+## STEP 13 - Prepare 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+## STEP 14 - Create Docker Registry for Dev Manually
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+``
 
 * Create a ``Jenkins Job`` to create Docker Registry for `dev` on AWS ECR manually.
 
@@ -518,22 +713,22 @@ aws ecr create-repository \
 ``` bash
 git add .
 git commit -m 'added script for creating ECR registry for dev'
-git push --set-upstream origin feature/msp-14
+git push --set-upstream origin feature/STEP-14
 git checkout dev
-git merge feature/msp-14
+git merge feature/STEP-14
 git push origin dev
 ```
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-## MSP 15 - Create a QA Automation Environment with Kubernetes - Part-1
+## STEP 15 - Create a QA Automation Environment with Kubernetes - Part-1
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
-- Create `feature/msp-15` branch from `dev`.
+- Create `feature/STEP-15` branch from `dev`.
 
 ```bash
 git checkout dev
-git branch feature/msp-15
-git checkout feature/msp-15
+git branch feature/STEP-15
+git checkout feature/STEP-15
 ```
 
 - Create a folder for kubernetes infrastructure with the name of `dev-k8s-terraform` under the `infrastructure` folder.
@@ -768,23 +963,23 @@ output worker-2-ip {
 ```bash
 git add .
 git commit -m 'added dev-k8s-terraform  for kubernetes infrastructure'
-git push --set-upstream origin feature/msp-15
+git push --set-upstream origin feature/STEP-15
 git checkout dev
-git merge feature/msp-15
+git merge feature/STEP-15
 git push origin dev
 ```
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-## MSP 16 - Create a QA Automation Environment with Kubernetes - Part-2
+## STEP 16 - Create a QA Automation Environment with Kubernetes - Part-2
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
-- Create `feature/msp-16` branch from `dev`.
+- Create `feature/STEP-16` branch from `dev`.
 
 ```bash
 git checkout dev
-git branch feature/msp-16
-git checkout feature/msp-16
-git push --set-upstream origin feature/msp-16
+git branch feature/STEP-16
+git checkout feature/STEP-16
+git push --set-upstream origin feature/STEP-16
 ```
 
 - Create a ``Jenkins Job`` to test `bash` scripts creating QA Automation Infrastructure for `dev` manually.
@@ -796,7 +991,7 @@ git push --set-upstream origin feature/msp-16
 - Source Code Management: Git
       Repository URL: https://github.com/[your-github-account]/petclinic-microservices.git
 - Branches to build:
-      Branch Specifier (blank for 'any'): */feature/msp-16
+      Branch Specifier (blank for 'any'): */feature/STEP-16
 - Build Environment: Add timestamps to the Console Output
 - Build:
       Add build step: Execute Shell
@@ -855,7 +1050,7 @@ ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i ${WORKSPACE}/
 
   * Click `Build Now`
 
-- Create a folder for ansible jobs under the `petclinic-microservices-with-db` folder.
+- Create a folder for ansible jobs under the `Jenkins` folder.
 
 ```bash
 mkdir -p ansible/inventory
@@ -874,7 +1069,7 @@ mkdir -p ansible/inventory
 ```bash
 git add .
 git commit -m 'added ansible static inventory host.ini for testing'
-git push --set-upstream origin feature/msp-16
+git push --set-upstream origin feature/STEP-16
 ```
 
 - Configure `test-creating-qa-automation-infrastructure` job and replace the existing script with the one below in order to test ansible by pinging static hosts.
@@ -1145,23 +1340,23 @@ git add .
 git commit -m 'added scripts for qa automation environment'
 git push
 git checkout dev
-git merge feature/msp-16
+git merge feature/STEP-16
 git push origin dev
 ```
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-## MSP 17 - Prepare Petlinic Kubernetes YAML Files
+## STEP 17 - Prepare Petlinic Kubernetes YAML Files
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
-* Create `feature/msp-17` branch from `dev`.
+* Create `feature/STEP-17` branch from `dev`.
 
 ``` bash
 git checkout dev
-git branch feature/msp-17
-git checkout feature/msp-17
+git branch feature/STEP-17
+git checkout feature/STEP-17
 ```
 
-* Create a folder with name of `k8s` under `petclinic-microservices-with-db` folder for keeping the manifest files of Petclinic App on Kubernetes cluster.
+* Create a folder with name of `k8s` under `Jenkins` folder for keeping the manifest files of Petclinic App on Kubernetes cluster.
 
 * Create a `docker-compose.yml` under `k8s` folder with the following content as to be used in conversion the k8s files.
 
@@ -1451,29 +1646,29 @@ stable-petclinicapp/petclinic_chart     0.0.2           0.1.0           A Helm c
 stable-petclinicapp/petclinic_chart     0.0.1           0.1.0           A Helm chart for Kubernetes
 ```
 
-* In ``Chart.yaml``, ``set`` the `version` value to `HELM_VERSION` in Chart.yaml for automation in jenkins pipeline.
+* In ``Chart.yaml``, ``set`` the `version` value(0.1.0) to `HELM_VERSION` in Chart.yaml for automation in jenkins pipeline.
 
 * Commit the change, then push the script to the remote repo.
 
 ``` bash
 git add .
 git commit -m 'added Configuration YAML Files for Kubernetes Deployment'
-git push --set-upstream origin feature/msp-17
+git push --set-upstream origin feature/STEP-17
 git checkout dev
-git merge feature/msp-17
+git merge feature/STEP-17
 git push origin dev
 ```
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-## MSP 18 - Prepare a QA Automation Pipeline for Nightly Builds
+## STEP 18 - Prepare a QA Automation Pipeline for Nightly Builds
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
-- Create `feature/msp-18` branch from `dev`.
+- Create `feature/STEP-18` branch from `dev`.
 
 ```bash
 git checkout dev
-git branch feature/msp-18
-git checkout feature/msp-18
+git branch feature/STEP-18
+git checkout feature/STEP-18
 ```
 
 - Prepare a script to ``package`` the app with maven Docker container and save it as `package-with-maven-container.sh` and save it under `jenkins` folder.
@@ -1542,19 +1737,19 @@ docker push "${IMAGE_TAG_PROMETHEUS_SERVICE}"
 ```bash
 git add .
 git commit -m 'added scripts for qa automation environment'
-git push --set-upstream origin feature/msp-18
+git push --set-upstream origin feature/STEP-18
 ```
 
   - OPTIONAL: Create a Jenkins job to test the scripts:
 
 ```yml
-- job name: test-msp-18-scripts
+- job name: test-STEP-18-scripts
 - job type: Freestyle project
 - GitHub project: https://github.com/[your-github-account]/petclinic-microservices
 - Source Code Management: Git
       Repository URL: https://github.com/[your-github-account]/petclinic-microservices.git
 - Branches to build:
-      Branch Specifier (blank for 'any'): */feature/msp-18
+      Branch Specifier (blank for 'any'): */feature/STEP-18
 - Build:
       Add build step: Execute Shell
       Command:
@@ -1657,7 +1852,7 @@ ansible-playbook --connection=local --inventory 127.0.0.1, --extra-vars "workspa
 - Run the following command to test the `dummy_selenium_test_headless.py` file.
 
 ```bash
-cd petclinic-microservices-with-db/
+cd Jenkins/
 ansible-playbook --connection=local --inventory 127.0.0.1, --extra-vars "workspace=$(pwd)" ./ansible/playbooks/pb_run_dummy_selenium_job.yaml
 ```
 
@@ -1668,10 +1863,10 @@ ansible-playbook --connection=local --inventory 127.0.0.1, --extra-vars "workspa
 ```bash
 git add .
 git commit -m 'added scripts for running dummy selenium job'
-git push --set-upstream origin feature/msp-18
+git push --set-upstream origin feature/STEP-18
 ```
 
-- Create a Jenkins job with name of `test-running-dummy-selenium-job` to check the setup for selenium tests by running dummy selenium job on `feature/msp-18` branch.
+- Create a Jenkins job with name of `test-running-dummy-selenium-job` to check the setup for selenium tests by running dummy selenium job on `feature/STEP-18` branch.
 
 ```yml
 - job name: test-running-dummy-selenium-job
@@ -1679,7 +1874,7 @@ git push --set-upstream origin feature/msp-18
 - Source Code Management: Git
       Repository URL: https://github.com/[your-github-account]/petclinic-microservices.git
 - Branches to build:
-      Branch Specifier (blank for 'any'): */feature/msp-18
+      Branch Specifier (blank for 'any'): */feature/STEP-18
 - Build:
       Add build step: Execute Shell
       Command:
@@ -1898,20 +2093,20 @@ git add .
 git commit -m 'added qa automation pipeline for dev'
 git push
 git checkout dev
-git merge feature/msp-18
+git merge feature/STEP-18
 git push origin dev
 ```
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-## MSP 19 - Create a QA Environment on EKS Cluster
+## STEP 19 - Create a QA Environment on EKS Cluster
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
-- Create `feature/msp-19` branch from `dev`.
+- Create `feature/STEP-19` branch from `dev`.
 
 ```bash
 git checkout dev
-git branch feature/msp-19
-git checkout feature/msp-19
+git branch feature/STEP-19
+git checkout feature/STEP-19
 ```
 
 - Create a folder for QA environment on EKS cluster setup with the name of `qa-eks-cluster` under `infrastructure` folder.
@@ -1940,9 +2135,9 @@ managedNodeGroups:
 ```bash
 git add .
 git commit -m 'added cluster.yaml file'
-git push --set-upstream origin feature/msp-19
+git push --set-upstream origin feature/STEP-19
 git checkout dev
-git merge feature/msp-19
+git merge feature/STEP-19
 git push origin dev
 ```
 - ### Install eksctl
@@ -2030,15 +2225,15 @@ kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/cont
 ```
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-## MSP 20 - Prepare Build Scripts for QA Environment
+## STEP 20 - Prepare Build Scripts for QA Environment
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
-- Create `feature/msp-20` branch from `dev`.
+- Create `feature/STEP-20` branch from `dev`.
 
 ```bash
 git checkout dev
-git branch feature/msp-20
-git checkout feature/msp-20
+git branch feature/STEP-20
+git checkout feature/STEP-20
 ```
 
 - Create a ``Jenkins Job`` to create Docker Registry for `QA` manually on AWS ECR.
@@ -2145,22 +2340,22 @@ AWS_REGION=$AWS_REGION helm upgrade --install \
 ```bash
 git add .
 git commit -m 'added build scripts for QA Environment'
-git push --set-upstream origin feature/msp-20
+git push --set-upstream origin feature/STEP-20
 git checkout dev
-git merge feature/msp-20
+git merge feature/STEP-20
 git push origin dev
 ```
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-## MSP 21 - Build and Deploy App on QA Environment Manually
+## STEP 21 - Build and Deploy App on QA Environment Manually
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
-- Create `feature/msp-21` branch from `dev`.
+- Create `feature/STEP-21` branch from `dev`.
 
 ```bash
 git checkout dev
-git branch feature/msp-21
-git checkout feature/msp-21
+git branch feature/STEP-21
+git checkout feature/STEP-21
 ```
 
 - Create a ``Jenkins Job`` with name of `build-and-deploy-petclinic-on-qa-env` to build and deploy the app on `QA environment` manually on `release` branch using following script, and save the script as `build-and-deploy-petclinic-on-qa-env-manually.sh` under `jenkins` folder.
@@ -2203,9 +2398,9 @@ docker image prune -af
 ```bash
 git add .
 git commit -m 'added script for jenkins job to build and deploy app on QA environment'
-git push --set-upstream origin feature/msp-21
+git push --set-upstream origin feature/STEP-21
 git checkout dev
-git merge feature/msp-21
+git merge feature/STEP-21
 git push origin dev
 ```
 
@@ -2221,15 +2416,15 @@ git push origin release
 - bind ingress address to your host name that defines in api-gateway-ingress.yaml on the route53 service.
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-## MSP 22 - Prepare a QA Pipeline
+## STEP 22 - Prepare a QA Pipeline
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
-- Create `feature/msp-22` branch from `dev`.
+- Create `feature/STEP-22` branch from `dev`.
 
 ```bash
 git checkout dev
-git branch feature/msp-22
-git checkout feature/msp-22
+git branch feature/STEP-22
+git checkout feature/STEP-22
 ```
 
 - Prepare a Jenkinsfile for `petclinic-weekly-qa` builds and save it as `jenkinsfile-petclinic-weekly-qa` under `jenkins` folder.
@@ -2311,9 +2506,9 @@ pipeline {
 ```bash
 git add .
 git commit -m 'added jenkinsfile petclinic-weekly-qa for release branch'
-git push --set-upstream origin feature/msp-22
+git push --set-upstream origin feature/STEP-22
 git checkout dev
-git merge feature/msp-22
+git merge feature/STEP-22
 git push origin dev
 ```
 
@@ -2348,15 +2543,15 @@ eksctl delete cluster -f cluster.yaml
 ```
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-## MSP 23 - Prepare High-availability RKE Kubernetes Cluster on AWS EC2
+## STEP 23 - Prepare High-availability RKE Kubernetes Cluster on AWS EC2
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
-* Create `feature/msp-23` branch from `release`.
+* Create `feature/STEP-23` branch from `release`.
 
 ``` bash
 git checkout release
-git branch feature/msp-23
-git checkout feature/msp-23
+git branch feature/STEP-23
+git checkout feature/STEP-23
 ```
 
 * Explain [Rancher Container Management Tool](https://rancher.com/docs/rancher/v2.x/en/overview/architecture/).
@@ -2639,14 +2834,14 @@ kubectl get pods --all-namespaces
 ``` bash
 git add .
 git commit -m 'added rancher setup files'
-git push --set-upstream origin feature/msp-23
+git push --set-upstream origin feature/STEP-23
 git checkout release
-git merge feature/msp-23
+git merge feature/STEP-23
 git push origin release
 ```
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-## MSP 24 - Install Rancher App on RKE Kubernetes Cluster
+## STEP 24 - Install Rancher App on RKE Kubernetes Cluster
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 * Add ``helm chart repositories`` of Rancher.
@@ -2690,18 +2885,18 @@ kubectl --kubeconfig $KUBECONFIG -n cattle-system exec $(kubectl --kubeconfig $K
 ```
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-## MSP 25 - Prepare Nexus Server
+## STEP 25 - Prepare Nexus Server
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
-* Create `feature/msp-25` branch from `release`.
+* Create `feature/STEP-25` branch from `release`.
 
 ``` bash
 git checkout release
-git branch feature/msp-25
-git checkout feature/msp-25
+git branch feature/STEP-25
+git checkout feature/STEP-25
 ```
 
-* Set up a Nexus Server by using docker image.  To do so, prepare a [Terraform File for Nexus Server](./msp-25-nexus-server-terraform-template) with following script and save it as `nexus-server.tf` under `infrastructure` folder. 
+* Set up a Nexus Server by using docker image.  To do so, prepare a [Terraform File for Nexus Server](./STEP-25-nexus-server-terraform-template) with following script and save it as `nexus-server.tf` under `infrastructure` folder. 
 
 * Note: Terraform will will launch an t3a.medium (Nexus needs 8 GB of RAM) EC2 instance using the Amazon Linux 2023 AMI with security group allowing `SSH (22)` and `Nexus Port (8081)` connections.
 
@@ -2837,22 +3032,22 @@ nano /home/ec2-user/.m2/settings.xml
 ``` bash
 git add .
 git commit -m 'added Nexus server terraform files'
-git push --set-upstream origin feature/msp-25
+git push --set-upstream origin feature/STEP-25
 git checkout release
-git merge feature/msp-25
+git merge feature/STEP-25
 git push origin release
 ```
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-## MSP 26 - Prepare a Staging Pipeline
+## STEP 26 - Prepare a Staging Pipeline
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
-* Create `feature/msp-26` branch from `release`.
+* Create `feature/STEP-26` branch from `release`.
 
 ``` bash
 git checkout release
-git branch feature/msp-26
-git checkout feature/msp-26
+git branch feature/STEP-26
+git checkout feature/STEP-26
 ```
 
 * To provide access of Rancher to the cloud resources, create a `Cloud Credentials` on `Cluster Management` segment for AWS on Rancher and name it as `Petclinic-AWS-Training-Account`. As region select `us-east-1`.
@@ -3089,22 +3284,22 @@ pipeline {
 ``` bash
 git add .
 git commit -m 'added jenkinsfile petclinic-staging for release branch'
-git push --set-upstream origin feature/msp-26
+git push --set-upstream origin feature/STEP-26
 git checkout release
-git merge feature/msp-26
+git merge feature/STEP-26
 git push origin release
 ```
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
-## MSP 27 - Prepare a Production Pipeline
+## STEP 27 - Prepare a Production Pipeline
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
-* Create `feature/msp-27` branch from `release`.
+* Create `feature/STEP-27` branch from `release`.
 
 ``` bash
 git checkout release
-git branch feature/msp-27
-git checkout feature/msp-27
+git branch feature/STEP-27
+git checkout feature/STEP-27
 ```
 
 - Switch user to jenkins for creating eks cluster. Execute following commands as `jenkins` user.
@@ -3358,9 +3553,9 @@ pipeline {
 ``` bash
 git add .
 git commit -m 'added jenkinsfile petclinic-production for main branch'
-git push --set-upstream origin feature/msp-27
+git push --set-upstream origin feature/STEP-27
 git checkout release
-git merge feature/msp-27
+git merge feature/STEP-27
 git push origin release
 ```
 
@@ -3390,15 +3585,15 @@ git push origin main
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-## MSP 28 - Setting Domain Name and TLS for Production Pipeline with Route 53
+## STEP 28 - Setting Domain Name and TLS for Production Pipeline with Route 53
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
-* Create `feature/msp-28` branch from `main`.
+* Create `feature/STEP-28` branch from `main`.
 
 ``` bash
 git checkout main
-git branch feature/msp-28
-git checkout feature/msp-28
+git branch feature/STEP-28
+git checkout feature/STEP-28
 ```
 
 * Create an `A` record of `petclinic.clarusway.us` in your hosted zone (in our case `clarusway.us`) using AWS Route 53 domain registrar and bind it to your `petclinic cluster`.
@@ -3514,14 +3709,14 @@ spec:
 ``` bash
 git add .
 git commit -m 'added tls scripts for petclinic-production'
-git push --set-upstream origin feature/msp-28
+git push --set-upstream origin feature/STEP-28
 git checkout main
-git merge feature/msp-28
+git merge feature/STEP-28
 git push origin main 
 ```
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-## MSP 29 - Monitoring with Prometheus and Grafana
+## STEP 29 - Monitoring with Prometheus and Grafana
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 * Change the port of Prometheus Service to `9090` and so that Grafana can scrape the data.
