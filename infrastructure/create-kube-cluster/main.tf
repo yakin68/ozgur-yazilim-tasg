@@ -24,10 +24,6 @@ resource "aws_instance" "master" {
   availability_zone = "us-east-1a"
   tags = {
     Name = "kube-master"
-    Project = "kube-ansible"
-    Role = "master"
-    Id = "1"
-    environment = "ozgur-yazilim"
   }
 }
 
