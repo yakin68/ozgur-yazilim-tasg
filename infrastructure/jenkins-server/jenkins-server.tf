@@ -86,11 +86,3 @@ resource "aws_iam_instance_profile" "tf-jenkins-server-profile" {
   name = var.jenkins-profile
   role = aws_iam_role.tf-jenkins-server-role.name
 }
-
-output "JenkinsDNS" {
-  value = aws_instance.tf-jenkins-server.public_dns
-}
-
-output "JenkinsURL" {
-  value = "http://${aws_instance.tf-jenkins-server.public_dns}:8080"
-}

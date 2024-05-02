@@ -35,24 +35,21 @@ sed -i 's/^ExecStart=.*/ExecStart=\/usr\/bin\/dockerd -H tcp:\/\/127.0.0.1:2376 
 systemctl daemon-reload
 systemctl restart jenkins
 
-
-# install python 3
-apt install -y python3-pip python3-devel
-
 # install ansible
-pip3 install ansible
-
-# install boto3
-pip3 install boto3 botocore
+sudo apt update
+sudo apt install software-properties-common -y
+sudo add-apt-repository --yes --update ppa:ansible/ansible
+sudo apt install ansible -y
 
 # install terraform
-wget https://releases.hashicorp.com/terraform/1.8.2/terraform_1.8.2_linux_amd64.zip
-unzip terraform_1.8.2_linux_amd64.zip -d /usr/local/bin
+wget -O- https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
+echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
+sudo apt update && sudo apt install terraform
 
-# Install Helm version 3+ on Jenkins Server. Introduction to Helm. Helm Installation.
-curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
+# Install Helm 
+curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
 chmod 700 get_helm.sh
-sudo ./get_helm.sh
+./get_helm.sh
 
 
 

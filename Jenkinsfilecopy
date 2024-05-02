@@ -109,5 +109,8 @@ pipeline {
             sh 'docker image prune -af'
         }
 
+        success {
+            mail bcc: '', body: 'Congrats !!! CICD Pipeline is successfull.', cc: '', from: '', replyTo: '', subject: 'Test Mail', to: 'yakin68@gmail.com'
+            }
     }
 }
