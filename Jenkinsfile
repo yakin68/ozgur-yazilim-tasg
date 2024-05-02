@@ -104,7 +104,31 @@ pipeline {
                 sh "sleep 60"    
                 sh "ansible-playbook -i ./ansible/inventory/dev_stack_dynamic_inventory_aws_ec2.yaml ./ansible/playbooks/dev-petclinic-deploy.yaml"
             }
-        }          
+        } 
+
+        stage('Destroy the infrastructure'){
+            steps{
+                timeout(time:5, unit:'DAYS'){
+                    input message:'Approve terminate'
+                }
+                sh """
+                docker image prune -af
+                aws ecr delete-repository \
+                  --repository-name ${APP_REPO_NAME} \
+                  --region ${AWS_REGION} \
+                  --force
+                """
+                echo 'Tear down the Kubernetes Cluster'
+                sh """
+                cd infrastructure/create-kube-cluster
+                terraform destroy -auto-approve -no-color
+                rm -rf .terraform
+                rm -rf .terraform.lock.hcl
+                rm -rf terraform.tfstate
+                rm -rf terraform.tfstate.backup
+                """                
+            }
+        }                 
     }
     post {
         always {
