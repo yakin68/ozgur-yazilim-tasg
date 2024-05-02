@@ -94,6 +94,9 @@ pipeline {
                 echo 'Deploying App on Kubernetes'
                 sh "envsubst < k8s/petclinic_chart/values-template.yaml > k8s/petclinic_chart/values.yaml"
                 sh "sed -i s/HELM_VERSION/${BUILD_NUMBER}/ k8s/petclinic_chart/Chart.yaml"
+                sh "helm plugin install https://github.com/hypnoglow/helm-s3.git"
+                sh "AWS_REGION=us-east-1 helm s3 init s3://petclinic-helm-charts-yakin/stable/myapp"
+                sh "AWS_REGION=us-east-1 helm repo add stable-petclinicapp s3://petclinic-helm-charts-yakin/stable/myapp/"
                 sh "helm repo add stable-petclinic s3://petclinic-helm-charts-yakin/stable/myapp/"
                 sh "helm package k8s/petclinic_chart"
                 sh "helm s3 push --force petclinic_chart-${BUILD_NUMBER}.tgz stable-petclinic"
