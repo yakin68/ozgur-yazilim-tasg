@@ -21,7 +21,7 @@
       kubectl create secret generic regcred -n ozguryzl-dev \
         --from-file=.dockerconfigjson=/home/ubuntu/.docker/config.json \
         --type=kubernetes.io/dockerconfigjson
-      AWS_REGION=$AWS_REGION helm repo add stable-ozguryzl s3://ozguryzl-helm-charts-yakin/stable/myapp/
+      AWS_REGION=$AWS_REGION helm repo add stable-ozguryzl s3://ozguryzl-helm-charts-yakin/stable/myapp/ || true
       AWS_REGION=$AWS_REGION helm repo update
       AWS_REGION=$AWS_REGION helm upgrade --install \
         ozguryzl-app-release stable-ozguryzl/ozguryzl_chart --version ${BUILD_NUMBER} \

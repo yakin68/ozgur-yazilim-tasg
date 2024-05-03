@@ -49,7 +49,7 @@ pipeline {
                 echo 'Preparing Tags for Docker Images'
                 script {
                     MVN_VERSION=sh(script:'. ${WORKSPACE}/target/maven-archiver/pom.properties && echo $version', returnStdout:true).trim()
-                    env.IMAGE_TAG_PETCLINIC="${ECR_REGISTRY}/${APP_REPO_NAME}:yakin-${APP_NAME}-prod-v${MVN_VERSION}-b${BUILD_NUMBER}"
+                    env.IMAGE_TAG_OZGURYZL="${ECR_REGISTRY}/${APP_REPO_NAME}:yakin-${APP_NAME}-prod-v${MVN_VERSION}-b${BUILD_NUMBER}"
                 }
             }
         }
@@ -92,18 +92,18 @@ pipeline {
         stage('Deploy App on Kubernetes cluster'){
             steps {
                 echo 'Deploying App on Kubernetes'
-                sh "envsubst < k8s/petclinic_chart/values-template.yaml > k8s/petclinic_chart/values.yaml"
-                sh "sed -i s/HELM_VERSION/${BUILD_NUMBER}/ k8s/petclinic_chart/Chart.yaml"
+                sh "envsubst < k8s/ozguryzl_chart/values-template.yaml > k8s/ozguryzl_chart/values.yaml"
+                sh "sed -i s/HELM_VERSION/${BUILD_NUMBER}/ k8s/ozguryzl_chart/Chart.yaml"
                 sh "helm plugin install https://github.com/hypnoglow/helm-s3.git || true"
                 sh "AWS_REGION=us-east-1 helm s3 init s3://${APP_NAME}-helm-charts-yakin/stable/myapp || true"
                 sh "AWS_REGION=us-east-1 helm repo add stable-${APP_NAME} s3://${APP_NAME}-helm-charts-yakin/stable/myapp/ || true"
-                sh "helm package k8s/petclinic_chart"
-                sh "helm s3 push --force petclinic_chart-${BUILD_NUMBER}.tgz stable-${APP_NAME}"
+                sh "helm package k8s/ozguryzl_chart"
+                sh "helm s3 push --force ozguryzl_chart-${BUILD_NUMBER}.tgz stable-${APP_NAME}"
                 sh "ansible --version"
                 sh "ansible-inventory --graph"
-                sh "envsubst < ansible/playbooks/dev-petclinic-deploy-template > ansible/playbooks/dev-petclinic-deploy.yaml"
+                sh "envsubst < ansible/playbooks/dev-ozguryzl-deploy-template > ansible/playbooks/dev-ozguryzl-deploy.yaml"
                 sh "sleep 60"    
-                sh "ansible-playbook -i ./ansible/inventory/dynamic_inventory_aws_ec2.yaml ./ansible/playbooks/dev-petclinic-deploy.yaml"
+                sh "ansible-playbook -i ./ansible/inventory/dynamic_inventory_aws_ec2.yaml ./ansible/playbooks/dev-ozguryzl-deploy.yaml"
                 timeout(time:5, unit:'DAYS'){
                     input message:'Approve terminate'
                 }             
@@ -133,34 +133,5 @@ pipeline {
                 """                
             }
         }                 
-    }
-    post {
-        always {
-            echo 'Deleting all local images'
-            sh 'docker image prune -af'
-            echo 'Delete the Image Repository on ECR'
-        }
-        failure {
-            sh """
-                aws ecr delete-repository \
-                  --repository-name ${APP_REPO_NAME} \
-                  --region ${AWS_REGION}\
-                  --force
-                """
-            echo 'Tear down the Kubernetes Cluster'
-            sh """
-            cd infrastructure/create-kube-cluster
-            terraform destroy -auto-approve -no-color
-            rm -rf .terraform
-            rm -rf .terraform.lock.hcl
-            rm -rf terraform.tfstate
-            rm -rf terraform.tfstate.backup
-            """
-            echo "Delete existing key pair using AWS CLI"
-            sh "aws ec2 delete-key-pair --region ${AWS_REGION} --key-name ${ANS_KEYPAIR}"
-            sh "rm -rf ${ANS_KEYPAIR}.pem"
-         
-
-        }
     }
 }
