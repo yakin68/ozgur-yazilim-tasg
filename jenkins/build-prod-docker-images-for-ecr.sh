@@ -1,1 +1,1 @@
-docker build --force-rm -t "${IMAGE_TAG_PETCLINIC}" .
+docker build --force-rm -t "${IMAGE_TAG_OZGURYZL}" .
