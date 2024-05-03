@@ -52,7 +52,11 @@ chmod 700 get_helm.sh
 ./get_helm.sh
 
 # install boto3
-sudo apt-get install python3-boto3 python3-botocore -y
+sudo apt update
+sudo apt-get install python3-pip -y
+sudo pip3 install --upgrade pip
+sudo pip3 install boto3 botocore
+sudo apt update
 
 # install aws cli
 sudo apt install unzip
