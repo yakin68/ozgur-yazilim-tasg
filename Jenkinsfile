@@ -26,11 +26,21 @@ pipeline {
             }
         }
 
+
+
+
         stage('Destroy the infrastructure'){
             steps{
                 timeout(time:5, unit:'DAYS'){
                     input message:'Approve terminate'
                 }
+                sh """
+                docker image prune -af
+                aws ecr delete-repository \
+                  --repository-name ${APP_REPO_NAME} \
+                  --region ${AWS_REGION} \
+                  --force
+                """
                 echo 'Tear down the Kubernetes Cluster'
                 sh """
                 cd infrastructure/create-kube-cluster
