@@ -1,12 +1,12 @@
 pipeline {
     agent any
     environment {
-        APP_NAME="petclinic"
-        APP_REPO_NAME="ozgur-yazilim-repo/${APP_NAME}"
+        APP_NAME="ozguryzl"
+        APP_REPO_NAME="ozgur-yzl-repo/${APP_NAME}"
         AWS_ACCOUNT_ID=sh(script:'aws sts get-caller-identity --query Account --output text', returnStdout:true).trim()
         AWS_REGION="us-east-1"
         ECR_REGISTRY="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
-        ANS_KEYPAIR="petclinic-${APP_NAME}-${BUILD_NUMBER}.key"
+        ANS_KEYPAIR="${APP_NAME}-kube-master-${BUILD_NUMBER}.key"
         ANSIBLE_PRIVATE_KEY_FILE="${WORKSPACE}/${ANS_KEYPAIR}"
         ANSIBLE_HOST_KEY_CHECKING="False"
     }
@@ -96,7 +96,7 @@ pipeline {
                 sh "sed -i s/HELM_VERSION/${BUILD_NUMBER}/ k8s/petclinic_chart/Chart.yaml"
                 sh "helm plugin install https://github.com/hypnoglow/helm-s3.git || true"
                 sh "AWS_REGION=us-east-1 helm s3 init s3://petclinic-helm-charts-yakin/stable/myapp || true"
-                sh "AWS_REGION=us-east-1 helm repo add stable-petclinicapp s3://petclinic-helm-charts-yakin/stable/myapp/ || true"
+                sh "AWS_REGION=us-east-1 helm repo add stable-petclinic s3://petclinic-helm-charts-yakin/stable/myapp/ || true"
                 sh "helm package k8s/petclinic_chart"
                 sh "helm s3 push --force petclinic_chart-${BUILD_NUMBER}.tgz stable-petclinic"
                 sh "ansible --version"

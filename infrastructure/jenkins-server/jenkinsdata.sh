@@ -53,3 +53,10 @@ chmod 700 get_helm.sh
 
 # install boto3
 sudo apt-get install python3-boto3 python3-botocore -y
+
+# install aws cli
+sudo apt install unzip
+curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+unzip awscliv2.zip
+sudo ./aws/install
+sudo apt update
