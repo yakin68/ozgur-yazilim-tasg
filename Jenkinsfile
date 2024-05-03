@@ -15,12 +15,12 @@ pipeline {
             steps {
                 script {
                     try {
-                        sh 'aws s3api head-bucket --bucket ${APP_NAME}-helm-charts-repo--region us-east-1'
+                        sh 'aws s3api head-bucket --bucket ${APP_NAME}-helm-charts-repo --region us-east-1'
                         echo 'Bucket already exists'
                     } catch (Exception e) {
                         echo 'Bucket does not exist. Creating...'
-                        sh 'aws s3api create-bucket --bucket ${APP_NAME}-helm-charts-repo--region us-east-1'
-                        sh 'aws s3api put-object --bucket ${APP_NAME}-helm-charts-repo--key stable/myapp/'
+                        sh 'aws s3api create-bucket --bucket ${APP_NAME}-helm-charts-repo --region us-east-1'
+                        sh 'aws s3api put-object --bucket ${APP_NAME}-helm-charts-repo --key stable/myapp/'
                     }
                 }
             }
