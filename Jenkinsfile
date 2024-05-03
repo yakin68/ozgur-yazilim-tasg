@@ -104,9 +104,7 @@ pipeline {
                 sh "envsubst < ansible/playbooks/dev-ozguryzl-deploy-template > ansible/playbooks/dev-ozguryzl-deploy.yaml"
                 sh "sleep 60"    
                 sh "ansible-playbook -i ./ansible/inventory/dynamic_inventory_aws_ec2.yaml ./ansible/playbooks/dev-ozguryzl-deploy.yaml"
-                timeout(time:5, unit:'DAYS'){
-                    input message:'Approve terminate'
-                }             
+                sh "sleep 600" 
             }
         } 
 
@@ -133,5 +131,34 @@ pipeline {
                 """                
             }
         }                 
+    }
+    post {
+        always {
+            echo 'Deleting all local images'
+            sh 'docker image prune -af'
+            echo 'Delete the Image Repository on ECR'
+        }
+        failure {
+            sh """
+                aws ecr delete-repository \
+                  --repository-name ${APP_REPO_NAME} \
+                  --region ${AWS_REGION}\
+                  --force
+                """
+            echo 'Tear down the Kubernetes Cluster'
+            sh """
+            cd infrastructure/create-kube-cluster
+            terraform destroy -auto-approve -no-color
+            rm -rf .terraform
+            rm -rf .terraform.lock.hcl
+            rm -rf terraform.tfstate
+            rm -rf terraform.tfstate.backup
+            """
+            echo "Delete existing key pair using AWS CLI"
+            sh "aws ec2 delete-key-pair --region ${AWS_REGION} --key-name ${ANS_KEYPAIR}"
+            sh "rm -rf ${ANS_KEYPAIR}.pem"
+         
+
+        }
     }
 }
