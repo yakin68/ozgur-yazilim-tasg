@@ -104,7 +104,9 @@ pipeline {
                 sh "envsubst < ansible/playbooks/dev-petclinic-deploy-template > ansible/playbooks/dev-petclinic-deploy.yaml"
                 sh "sleep 60"    
                 sh "ansible-playbook -i ./ansible/inventory/dynamic_inventory_aws_ec2.yaml ./ansible/playbooks/dev-petclinic-deploy.yaml"
-                sh "sleep 600" 
+                timeout(time:5, unit:'DAYS'){
+                    input message:'Approve terminate'
+                }             
             }
         } 
 
