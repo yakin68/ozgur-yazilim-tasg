@@ -9,18 +9,18 @@ This project aims to create full CI/CD Pipeline for microservices based applicat
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 
-* create a repo named ozgur-yazilim-tasg. No readme.md.
+* create a repo named ozguryzl-tasg. No readme.md.
 
 ``` bash
-git clone https://github.com/yakin68/ozgur-yazilim-tasg.git 
+git clone https://github.com/yakin68/ozguryzl-task.git 
 ```
 
 * Connect to the [Spring Petclinic Microservices Application] (https://github.com/spring-petclinic/spring-petclinic-htmx.git. repo and copy the Spring Petclinic Microservices Application to the repo we created. If you want, you can "fork" or download the repo.
 
-* What should be taken into consideration here is to delete the ".git" directory in the "Spring Petclinic Microservices Application" report and the ".git" directory in the "git clone https://github.com/yakin68/ozgur-yazilim-tasg.git" locale clone when copying the application. must. Otherwise, you may receive errors on the project. You need to do this if you want the project to be yours and you want to make changes to it.
+* What should be taken into consideration here is to delete the ".git" directory in the "Spring Petclinic Microservices Application" report and the ".git" directory in the "git clone https://github.com/yakin68/ozguryzl-tasg.git" locale clone when copying the application. must. Otherwise, you may receive errors on the project. You need to do this if you want the project to be yours and you want to make changes to it.
 
 ```bash
-cd ozgur-yazilim-tasg
+cd ozguryzl-tasg
 rm -rf .git
 ```
 
@@ -32,10 +32,10 @@ git add .
 git config --global user.email "yakin68@gmail.com"
 git config --global user.name "yakin68"
 git commit -m "first commit"
-git remote add origin https://[github username]:[your-token]@github.com/yakin68/ozgur-yazilim-tasg.git  
+git remote add origin https://[github username]:[your-token]@github.com/yakin68/ozguryzl-tasg.git  
 ```
 
-* Do not push the token to github and do not share it with anyone. *This command is used to add a remote repository to a Git repository. In the relevant example, a remote repository is added with the git remote add command. The name origin is usually used by default for the main remote repository. You specify your GitHub username in the [github username] section, your GitHub account's access token in the [your-token] section, and the repository address you want to add in the yakin68/ozgur-yazilim-tasg.git section. If you use this command, you specify your GitHub username and If you insert your access token correctly, you will link a local Git repository to the remote repository "yakin68/ozgur-yazilim-tasg" on GitHub. This allows you to push the changes you made locally to this remote repository and pull them from the remote repository to the local repository.
+* Do not push the token to github and do not share it with anyone. *This command is used to add a remote repository to a Git repository. In the relevant example, a remote repository is added with the git remote add command. The name origin is usually used by default for the main remote repository. You specify your GitHub username in the [github username] section, your GitHub account's access token in the [your-token] section, and the repository address you want to add in the yakin68/ozguryzl-tasg.git section. If you use this command, you specify your GitHub username and If you insert your access token correctly, you will link a local Git repository to the remote repository "yakin68/ozguryzl-tasg" on GitHub. This allows you to push the changes you made locally to this remote repository and pull them from the remote repository to the local repository.
 
 git push origin main
 ```
@@ -47,7 +47,7 @@ git push origin main
 
 * Before preparing the microservice architecture, it is a best-practice method to manually check whether it works or not. You can also follow readme.md in the app's repo. For this purpose, 2 virtual machines were requested to be set up in the tag, 1 virtual machine will be deleted after it is created for testing.
 
-* Terraform files are prepared under 'infrastructure' in the (https://github.com/yakin68/ozgur-yazilim-tasg.git) repo.
+* Terraform files are prepared under 'infrastructure' in the (https://github.com/yakin68/ozguryzl-tasg.git) repo.
  
 * Run the terraform files in the /infrastructure/test-of-petclinic folder. (This will stand up a virtual machine for testing.)
    
