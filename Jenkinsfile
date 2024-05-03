@@ -15,12 +15,12 @@ pipeline {
             steps {
                 script {
                     try {
-                        sh 'aws s3api head-bucket --bucket petclinic-helm-charts-yakin --region us-east-1'
+                        sh 'aws s3api head-bucket --bucket ${APP_NAME}-helm-charts-yakin --region us-east-1'
                         echo 'Bucket already exists'
                     } catch (Exception e) {
                         echo 'Bucket does not exist. Creating...'
-                        sh 'aws s3api create-bucket --bucket petclinic-helm-charts-yakin --region us-east-1'
-                        sh 'aws s3api put-object --bucket petclinic-helm-charts-yakin --key stable/myapp/'
+                        sh 'aws s3api create-bucket --bucket ${APP_NAME}-helm-charts-yakin --region us-east-1'
+                        sh 'aws s3api put-object --bucket ${APP_NAME}-helm-charts-yakin --key stable/myapp/'
                     }
                 }
             }
@@ -49,7 +49,7 @@ pipeline {
                 echo 'Preparing Tags for Docker Images'
                 script {
                     MVN_VERSION=sh(script:'. ${WORKSPACE}/target/maven-archiver/pom.properties && echo $version', returnStdout:true).trim()
-                    env.IMAGE_TAG_PETCLINIC="${ECR_REGISTRY}/${APP_REPO_NAME}:yakin-petclinic-prod-v${MVN_VERSION}-b${BUILD_NUMBER}"
+                    env.IMAGE_TAG_PETCLINIC="${ECR_REGISTRY}/${APP_REPO_NAME}:yakin-${APP_NAME}-prod-v${MVN_VERSION}-b${BUILD_NUMBER}"
                 }
             }
         }
@@ -95,10 +95,10 @@ pipeline {
                 sh "envsubst < k8s/petclinic_chart/values-template.yaml > k8s/petclinic_chart/values.yaml"
                 sh "sed -i s/HELM_VERSION/${BUILD_NUMBER}/ k8s/petclinic_chart/Chart.yaml"
                 sh "helm plugin install https://github.com/hypnoglow/helm-s3.git || true"
-                sh "AWS_REGION=us-east-1 helm s3 init s3://petclinic-helm-charts-yakin/stable/myapp || true"
-                sh "AWS_REGION=us-east-1 helm repo add stable-petclinic s3://petclinic-helm-charts-yakin/stable/myapp/ || true"
+                sh "AWS_REGION=us-east-1 helm s3 init s3://${APP_NAME}-helm-charts-yakin/stable/myapp || true"
+                sh "AWS_REGION=us-east-1 helm repo add stable-${APP_NAME} s3://${APP_NAME}-helm-charts-yakin/stable/myapp/ || true"
                 sh "helm package k8s/petclinic_chart"
-                sh "helm s3 push --force petclinic_chart-${BUILD_NUMBER}.tgz stable-petclinic"
+                sh "helm s3 push --force petclinic_chart-${BUILD_NUMBER}.tgz stable-${APP_NAME}"
                 sh "ansible --version"
                 sh "ansible-inventory --graph"
                 sh "envsubst < ansible/playbooks/dev-petclinic-deploy-template > ansible/playbooks/dev-petclinic-deploy.yaml"
