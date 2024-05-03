@@ -49,7 +49,7 @@ pipeline {
                 echo 'Preparing Tags for Docker Images'
                 script {
                     MVN_VERSION=sh(script:'. ${WORKSPACE}/target/maven-archiver/pom.properties && echo $version', returnStdout:true).trim()
-                    env.IMAGE_TAG_OZGURYZL="${ECR_REGISTRY}/${APP_REPO_NAME}:yakin-${APP_NAME}-prod-v${MVN_VERSION}-b${BUILD_NUMBER}"
+                    env.IMAGE_TAG_OZGURYZL="${ECR_REGISTRY}/${APP_REPO_NAME}:${APP_NAME}-v${MVN_VERSION}-b${BUILD_NUMBER}"
                 }
             }
         }
