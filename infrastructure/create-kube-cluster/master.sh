@@ -45,6 +45,6 @@ sudo ./get_helm.sh
 sudo apt-get install python3-pip -y
 sudo pip3 install --upgrade pip
 sudo pip3 install boto3 botocore
-
+sudo apt update
 
 
