@@ -110,7 +110,6 @@ pipeline {
                 sh "python3 --version"
                 sh "ansible --version"
                 sh "ansible-playbook --version"
-                sh "ansible-inventory --graph"
                 sh "ansible-galaxy --version"
                 sh "ansible-inventory --graph -v -i ./ansible/inventory/dynamic_inventory_aws_ec2.yaml"
                 sh "ansible -i ./ansible/inventory/dynamic_inventory_aws_ec2.yaml all -m ping"

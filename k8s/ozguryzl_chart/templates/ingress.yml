@@ -8,12 +8,10 @@ spec:
     - host: '{{ .Values.DNS_NAME }}'
       http:
         paths:
-          - backend:
-              service:
-                name: petclinic-service
-                port:
-                  number: 8080
-            path: /
-            pathType: Prefix
-status:
-  loadBalancer: {}
+        - pathType: Prefix
+          path: "/"
+          backend:
+            service:
+              name: ozguryzl-service
+              port:
+                number: 8080
