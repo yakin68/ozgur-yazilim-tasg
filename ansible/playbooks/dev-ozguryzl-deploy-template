@@ -15,13 +15,13 @@
 
   - name: deploy ozguryzl application
     shell: |
-      helm plugin install https://github.com/hypnoglow/helm-s3.git || true
+      helm plugin install https://github.com/hypnoglow/helm-s3.git
       kubectl create ns ozguryzl-dev
-      kubectl delete secret regcred -n ozguryzl-dev || true
+      kubectl delete secret regcred -n ozguryzl-dev
       kubectl create secret generic regcred -n ozguryzl-dev \
         --from-file=.dockerconfigjson=/home/ubuntu/.docker/config.json \
         --type=kubernetes.io/dockerconfigjson
-      AWS_REGION=$AWS_REGION helm repo add stable-ozguryzl s3://ozguryzl-helm-charts-repo/stable/myapp/ || true
+      AWS_REGION=$AWS_REGION helm repo add stable-ozguryzl s3://ozguryzl-helm-charts-repo/stable/myapp/
       AWS_REGION=$AWS_REGION helm repo update
       AWS_REGION=$AWS_REGION helm upgrade --install \
         ozguryzl-app-release stable-ozguryzl/ozguryzl_chart --version ${BUILD_NUMBER} \
