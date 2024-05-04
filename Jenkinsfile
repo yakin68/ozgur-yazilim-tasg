@@ -83,6 +83,7 @@ pipeline {
                 echo "Creating Key Pair for ${APP_NAME} App"
                 sh "aws ec2 create-key-pair --region ${AWS_REGION} --key-name ${ANS_KEYPAIR} --query KeyMaterial --output text > ${ANS_KEYPAIR}.pem"
                 sh "chmod 400 ${ANS_KEYPAIR}.pem"
+                sh "sudo chown jenkins:jenkins ${ANS_KEYPAIR}.pem"
             }
         }
         stage('Create Infrastructure Kubernetes Cluster ') {
