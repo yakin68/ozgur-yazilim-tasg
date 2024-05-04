@@ -9,9 +9,11 @@ spec:
       http:
         paths:
         - pathType: Prefix
-          path: "/"
+          path: /
           backend:
             service:
               name: ozguryzl-service
               port:
                 number: 8080
+status:
+  loadBalancer: {}

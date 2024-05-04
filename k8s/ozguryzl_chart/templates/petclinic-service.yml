@@ -8,5 +8,8 @@ spec:
   selector:
     app: petclinic
   ports:
-  - port: 8080
-    targetPort: 8080
+    - name: "8080"
+      nodePort: 30001
+      port: 8080
+      targetPort: 8080
+  type: NodePort
