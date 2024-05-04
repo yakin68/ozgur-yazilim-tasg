@@ -12,6 +12,10 @@ spec:
       labels:
         app: mysql-db
     spec:
+      tolerations:
+      - key: "node-role.kubernetes.io/control-plane"
+        operator: "Exists"
+        effect: "NoSchedule"    
       containers:
       - name: mysql-db
         image: mysql:8.2

@@ -12,6 +12,10 @@ spec:
       labels:
         app: petclinic
     spec:
+      tolerations:
+      - key: "node-role.kubernetes.io/control-plane"
+        operator: "Exists"
+        effect: "NoSchedule"    
       containers:
       - name: petclinic
         image: '{{ .Values.IMAGE_TAG_OZGURYZL }}'
