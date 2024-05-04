@@ -96,7 +96,7 @@ pipeline {
                 """
                 script {
                     echo "Kubernetes Master is not UP and running yet."
-                    env.id = sh(script: 'aws ec2 describe-instances --filters Name=tag-value,Values=master Name=tag-value,Values=tera-kube-ans Name=instance-state-name,Values=running --query Reservations[*].Instances[*].[InstanceId] --output text',  returnStdout:true).trim()
+                    env.id = sh(script: 'aws ec2 describe-instances --filters Name=tag-value,Values=master Name=tag-value,Values=kube-master Name=instance-state-name,Values=running --query Reservations[*].Instances[*].[InstanceId] --output text',  returnStdout:true).trim()
                     sh 'aws ec2 wait instance-status-ok --instance-ids $id'
                 }
             }
@@ -107,7 +107,7 @@ pipeline {
                 sh "envsubst < ansible/playbooks/dev-ozguryzl-deploy-template > ansible/playbooks/dev-ozguryzl-deploy.yaml"
                 sh "pip show botocore"
                 sh "pip show boto3"
-                sh "python –version"
+                sh "python3 --version"
                 sh "ansible --version"
                 sh "ansible-playbook --version"
                 sh "ansible-inventory --graph"
