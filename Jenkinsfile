@@ -66,6 +66,18 @@ pipeline {
                 sh ". ./jenkins/push-prod-docker-images-to-ecr.sh"
             }
         }
+        stage('Push Helm chart to S3') {
+            steps {
+                echo "Pushing helm chart"
+                sh "envsubst < k8s/ozguryzl_chart/values-template.yaml > k8s/ozguryzl_chart/values.yaml"
+                sh "sed -i s/HELM_VERSION/${BUILD_NUMBER}/ k8s/ozguryzl_chart/Chart.yaml"
+                sh "helm plugin install https://github.com/hypnoglow/helm-s3.git || true"
+                sh "AWS_REGION=us-east-1 helm s3 init s3://${APP_NAME}-helm-charts-repo/stable/myapp || true"
+                sh "AWS_REGION=us-east-1 helm repo add stable-${APP_NAME} s3://${APP_NAME}-helm-charts-repo/stable/myapp/ || true"
+                sh "helm package k8s/ozguryzl_chart"
+                sh "helm s3 push --force ozguryzl_chart-${BUILD_NUMBER}.tgz stable-${APP_NAME}"
+            }
+        }        
         stage('Create Key Pair for Ansible') {
             steps {
                 echo "Creating Key Pair for ${APP_NAME} App"
@@ -92,19 +104,11 @@ pipeline {
         stage('Deploy App on Kubernetes cluster'){
             steps {
                 echo 'Deploying App on Kubernetes'
-                sh "envsubst < k8s/ozguryzl_chart/values-template.yaml > k8s/ozguryzl_chart/values.yaml"
-                sh "sed -i s/HELM_VERSION/${BUILD_NUMBER}/ k8s/ozguryzl_chart/Chart.yaml"
-                sh "helm plugin install https://github.com/hypnoglow/helm-s3.git || true"
-                sh "AWS_REGION=us-east-1 helm s3 init s3://${APP_NAME}-helm-charts-repo/stable/myapp || true"
-                sh "AWS_REGION=us-east-1 helm repo add stable-${APP_NAME} s3://${APP_NAME}-helm-charts-repo/stable/myapp/ || true"
-                sh "helm package k8s/ozguryzl_chart"
-                sh "helm s3 push --force ozguryzl_chart-${BUILD_NUMBER}.tgz stable-${APP_NAME}"
                 sh "ansible --version"
                 sh "ansible-inventory --graph"
                 sh "envsubst < ansible/playbooks/dev-ozguryzl-deploy-template > ansible/playbooks/dev-ozguryzl-deploy.yaml"
                 sh "sleep 60"    
                 sh "ansible-playbook -i ./ansible/inventory/dynamic_inventory_aws_ec2.yaml ./ansible/playbooks/dev-ozguryzl-deploy.yaml"
-                sh "sleep 600" 
             }
         } 
 
