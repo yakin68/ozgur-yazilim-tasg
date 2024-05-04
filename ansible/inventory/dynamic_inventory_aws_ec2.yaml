@@ -4,6 +4,7 @@ regions:
 filters:
   tag:Name: 
     - kube-master
+  instance-state-name: running  
 keyed_groups:
   - key: tags['Name']
     prefix: 'all_instances'
