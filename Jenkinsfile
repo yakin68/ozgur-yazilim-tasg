@@ -25,9 +25,88 @@ pipeline {
                 }
             }
         }
-
-
-
+        stage('Create ECR Private Repo') {
+            steps {
+                echo "Creating ECR Private Repo for ${APP_NAME}"
+                sh '''
+                aws ecr describe-repositories --repository-name ${APP_REPO_NAME} --region $AWS_REGION || \
+                    aws ecr create-repository \
+                    --repository-name ${APP_REPO_NAME} \
+                    --image-scanning-configuration scanOnPush=true \
+                    --image-tag-mutability MUTABLE \
+                    --region  $AWS_REGION
+                '''
+                }
+        }
+        stage('Package application') {
+            steps {
+                echo 'Packaging the app into jars with maven'
+                sh ". ./jenkins/package-with-maven-container.sh"
+            }
+        }
+        stage('Prepare Tags for Docker Images') {
+            steps {
+                echo 'Preparing Tags for Docker Images'
+                script {
+                    MVN_VERSION=sh(script:'. ${WORKSPACE}/target/maven-archiver/pom.properties && echo $version', returnStdout:true).trim()
+                    env.IMAGE_TAG_OZGURYZL="${ECR_REGISTRY}/${APP_REPO_NAME}:${APP_NAME}-v${MVN_VERSION}-b${BUILD_NUMBER}"
+                }
+            }
+        }
+        stage('Build App Docker Images') {
+            steps {
+                echo 'Building ${APP_NAME} App Dev Images'
+                sh ". ./jenkins/build-prod-docker-images-for-ecr.sh"
+                sh 'docker image ls'
+            }
+        }
+        stage('Push Images to ECR Repo') {
+            steps {
+                echo "Pushing ${APP_NAME} App Images to ECR Repo"
+                sh ". ./jenkins/push-prod-docker-images-to-ecr.sh"
+            }
+        }
+        stage('Create Key Pair for Ansible') {
+            steps {
+                echo "Creating Key Pair for ${APP_NAME} App"
+                sh "aws ec2 create-key-pair --region ${AWS_REGION} --key-name ${ANS_KEYPAIR} --query KeyMaterial --output text > ${ANS_KEYPAIR}.pem"
+                sh "chmod 400 ${ANS_KEYPAIR}.pem"
+            }
+        }
+        stage('Create Infrastructure Kubernetes Cluster ') {
+            steps {
+                echo 'Creating QA Automation Infrastructure for Dev Environment'
+                sh """
+                    cd infrastructure/create-kube-cluster
+                    sed -i "s/yaksonkey/$ANS_KEYPAIR/g" main.tf
+                    terraform init
+                    terraform apply -auto-approve -no-color
+                """
+                script {
+                    echo "Kubernetes Master is not UP and running yet."
+                    env.id = sh(script: 'aws ec2 describe-instances --filters Name=tag-value,Values=master Name=tag-value,Values=tera-kube-ans Name=instance-state-name,Values=running --query Reservations[*].Instances[*].[InstanceId] --output text',  returnStdout:true).trim()
+                    sh 'aws ec2 wait instance-status-ok --instance-ids $id'
+                }
+            }
+        }
+        stage('Deploy App on Kubernetes cluster'){
+            steps {
+                echo 'Deploying App on Kubernetes'
+                sh "envsubst < k8s/ozguryzl_chart/values-template.yaml > k8s/ozguryzl_chart/values.yaml"
+                sh "sed -i s/HELM_VERSION/${BUILD_NUMBER}/ k8s/ozguryzl_chart/Chart.yaml"
+                sh "helm plugin install https://github.com/hypnoglow/helm-s3.git || true"
+                sh "AWS_REGION=us-east-1 helm s3 init s3://${APP_NAME}-helm-charts-repo/stable/myapp || true"
+                sh "AWS_REGION=us-east-1 helm repo add stable-${APP_NAME} s3://${APP_NAME}-helm-charts-repo/stable/myapp/ || true"
+                sh "helm package k8s/ozguryzl_chart"
+                sh "helm s3 push --force ozguryzl_chart-${BUILD_NUMBER}.tgz stable-${APP_NAME}"
+                sh "ansible --version"
+                sh "ansible-inventory --graph"
+                sh "envsubst < ansible/playbooks/dev-ozguryzl-deploy-template > ansible/playbooks/dev-ozguryzl-deploy.yaml"
+                sh "sleep 60"    
+                sh "ansible-playbook -i ./ansible/inventory/dynamic_inventory_aws_ec2.yaml ./ansible/playbooks/dev-ozguryzl-deploy.yaml"
+                sh "sleep 600" 
+            }
+        } 
 
         stage('Destroy the infrastructure'){
             steps{
