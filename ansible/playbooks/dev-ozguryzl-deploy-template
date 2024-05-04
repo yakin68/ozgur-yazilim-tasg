@@ -1,4 +1,4 @@
-- hosts: kube_master
+- hosts: all
   tasks:
 
   - name: Create .docker folder
