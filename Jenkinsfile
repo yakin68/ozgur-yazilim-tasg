@@ -114,7 +114,7 @@ pipeline {
                 sh "ansible-galaxy --version"
                 sh "ansible-inventory --graph -v -i ./ansible/inventory/dynamic_inventory_aws_ec2.yaml"
                 sh "ansible -i ./ansible/inventory/dynamic_inventory_aws_ec2.yaml all -m ping"
-                timeout(time:5, unit:'DAYS') 
+                sh "sleep 600"  
                 sh "ansible-playbook -i ./ansible/inventory/dynamic_inventory_aws_ec2.yaml ./ansible/playbooks/dev-ozguryzl-deploy.yaml"
             }
         } 
