@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: petclinic
-        image: '{{ .Values.IMAGE_TAG_PETCLINIC }}'
+        image: '{{ .Values.IMAGE_TAG_OZGURYZL }}'
         ports:
         - containerPort: 8080
         resources:
