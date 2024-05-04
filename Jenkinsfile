@@ -105,11 +105,15 @@ pipeline {
             steps {
                 echo 'Deploying App on Kubernetes'
                 sh "envsubst < ansible/playbooks/dev-ozguryzl-deploy-template > ansible/playbooks/dev-ozguryzl-deploy.yaml"
+                sh "pip show botocore"
+                sh "pip show boto3"
+                sh "python –version"
                 sh "ansible --version"
                 sh "ansible-playbook --version"
                 sh "ansible-inventory --graph"
                 sh "ansible-galaxy --version"
-                sh "sleep 60"    
+                sh "ansible-inventory --graph -i dynamic_inventory_aws_ec2.yaml"
+                sh "sleep 300"    
                 sh "ansible-playbook -i ./ansible/inventory/dynamic_inventory_aws_ec2.yaml ./ansible/playbooks/dev-ozguryzl-deploy.yaml"
             }
         } 
