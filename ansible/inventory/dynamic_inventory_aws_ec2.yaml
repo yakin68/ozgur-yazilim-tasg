@@ -5,7 +5,10 @@ filters:
   tag:Name: 
     - kube-master
 keyed_groups:
-  - key: tags.Name
-    separator: ''
+  - key: tags['Name']
+    prefix: 'all_instances'
+hostnames:
+  - "ip-address"    
 compose:
   ansible_host: public_ip_address
+  ansible_user: "'ubuntu'"
