@@ -3,7 +3,7 @@
 apt update -y
 # set server hostname as jenkins-server
 hostnamectl set-hostname jenkins-server
-
+sudo chown jenkins:jenkins /var/lib/jenkins/workspace
 # install git
 apt install git -y
 

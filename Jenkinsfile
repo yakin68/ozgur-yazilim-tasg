@@ -7,7 +7,7 @@ pipeline {
         AWS_REGION="us-east-1"
         ECR_REGISTRY="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
         ANS_KEYPAIR="${APP_NAME}-kube-master-${BUILD_NUMBER}"
-        ANSIBLE_PRIVATE_KEY_FILE="${WORKSPACE}/${ANS_KEYPAIR}"
+        ANSIBLE_PRIVATE_KEY_FILE="${WORKSPACE}/${ANS_KEYPAIR}.pem"
         ANSIBLE_HOST_KEY_CHECKING="False"
     }
     stages {
@@ -116,7 +116,7 @@ pipeline {
                 sh "ansible-inventory --graph -v -i ./ansible/inventory/dynamic_inventory_aws_ec2.yaml"
                 sh "ansible -i ./ansible/inventory/dynamic_inventory_aws_ec2.yaml all -m ping"
                 sh "ansible-playbook -i ./ansible/inventory/dynamic_inventory_aws_ec2.yaml ./ansible/playbooks/dev-ozguryzl-deploy.yaml"
-                sh "sleep 300"    
+                sh "sleep 600"    
             }
         } 
 
