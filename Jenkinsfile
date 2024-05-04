@@ -109,7 +109,7 @@ pipeline {
                 sh "ansible-playbook --version"
                 sh "ansible-inventory --graph"
                 sh "ansible-galaxy --version"
-                sh "sleep 600"    
+                sh "sleep 60"    
                 sh "ansible-playbook -i ./ansible/inventory/dynamic_inventory_aws_ec2.yaml ./ansible/playbooks/dev-ozguryzl-deploy.yaml"
             }
         } 
