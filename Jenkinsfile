@@ -104,10 +104,12 @@ pipeline {
         stage('Deploy App on Kubernetes cluster'){
             steps {
                 echo 'Deploying App on Kubernetes'
-                sh "ansible --version"
-                sh "ansible-inventory --graph"
                 sh "envsubst < ansible/playbooks/dev-ozguryzl-deploy-template > ansible/playbooks/dev-ozguryzl-deploy.yaml"
-                sh "sleep 60"    
+                sh "ansible --version"
+                sh "ansible-playbook --version"
+                sh "ansible-inventory --graph"
+                sh "ansible-galaxy --version"
+                sh "sleep 600"    
                 sh "ansible-playbook -i ./ansible/inventory/dynamic_inventory_aws_ec2.yaml ./ansible/playbooks/dev-ozguryzl-deploy.yaml"
             }
         } 
