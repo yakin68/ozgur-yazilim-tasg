@@ -11,5 +11,4 @@ keyed_groups:
 hostnames:
   - "ip-address"    
 compose:
-  ansible_host: public_ip_address
   ansible_user: "'ubuntu'"
