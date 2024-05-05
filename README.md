@@ -782,3 +782,11 @@ The `post` section in a Jenkins pipeline defines actions that should be taken af
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 ## STEP 14 - metalLB
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # #
+## STEP 14 - Install Rancher App on Kubernetes Cluster
+# # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # #
+## STEP 14 - Monitoring with Prometheus and Grafana
+# # # # # # # # # # # # # # # # # # # # # # # # # # # #
