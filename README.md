@@ -12,12 +12,12 @@ This project aims to create full CI/CD Pipeline for microservice based applicati
 * create a private repo named ozgur-yzl-tasg. No readme.md.
 
 ``` bash
-git clone https://github.com/yakin68/ozgur-yzl-task.git 
+git clone https://github.com/yakin68/ozgur-yzl-tasg.git 
 ```
 
 * Connect to the [Spring Petclinic Microservices Application] {https://github.com/spring-projects/spring-petclinic.git} repo and copy the Spring Petclinic Microservices Application to the repo we created. If you want, you can "fork" or download the repo.
 
-* What should be taken into consideration here is to delete the ".git" directory in the "Spring Petclinic Microservices Application" report and the ".git" directory in the "git clone https://github.com/yakin68/ozgur-yzl-task.git" locale clone when copying the application. must. Otherwise, you may receive errors on the project. You need to do this if you want the project to be yours and you want to make changes to it.
+* What should be taken into consideration here is to delete the ".git" directory in the "Spring Petclinic Microservices Application" report and the ".git" directory in the "git clone https://github.com/yakin68/ozgur-yzl-tasg.git" locale clone when copying the application. must. Otherwise, you may receive errors on the project. You need to do this if you want the project to be yours and you want to make changes to it.
 
 ```bash
 cd ozgur-yzl-tasg
@@ -36,7 +36,7 @@ git remote add origin https://[github username]:[your-token]@github.com/yakin68/
 git push origin main
 ```
 
-* Do not push the token to github and do not share it with anyone. *This command is used to add a remote repository to a Git repository. In the relevant example, a remote repository is added with the git remote add command. The name origin is usually used by default for the main remote repository. You specify your GitHub username in the [github username] section, your GitHub account's access token in the [your-token] section, and the repository address you want to add in the yakin68/ozguryzl-task.git section. If you use this command, you specify your GitHub username and If you insert your access token correctly, you will link a local Git repository to the remote repository "yakin68/ozgur-yzl-task" on GitHub. This allows you to push the changes you made locally to this remote repository and pull them from the remote repository to the local repository.
+* Do not push the token to github and do not share it with anyone. *This command is used to add a remote repository to a Git repository. In the relevant example, a remote repository is added with the git remote add command. The name origin is usually used by default for the main remote repository. You specify your GitHub username in the [github username] section, your GitHub account's access token in the [your-token] section, and the repository address you want to add in the yakin68/ozguryzl-tasg.git section. If you use this command, you specify your GitHub username and If you insert your access token correctly, you will link a local Git repository to the remote repository "yakin68/ozgur-yzl-tasg" on GitHub. This allows you to push the changes you made locally to this remote repository and pull them from the remote repository to the local repository.
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -270,7 +270,7 @@ variable "jenkins-role" {}
 * Create a job in Jenkins or connect to Jenkins server via SSH  
 * On the command line run
 ``` bash  
-cd ozgur-yzl-task
+cd ozgur-yzl-tasg
 ./mvnw package
 java -jar target/*.jar
 ```
