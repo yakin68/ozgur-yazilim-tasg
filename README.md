@@ -1,4 +1,4 @@
-# Microservices CI/CD Pipeline
+# Microservices CI/CD Pipeline with Jenkin
 
 ## Description
 
@@ -49,7 +49,7 @@ git push origin main
 mkdir -p infrastructure/jenkins-server
 ```
 
-* Prepare a terraform file for jenkins server,  and save it as `jenkins-server.tf` , `jenkinsdata.sh` ,`jenkins.auto.tfvars.tf` , `jenkins_variables.tf`under the `infrastructure/jenkins-server
+* Prepare a terraform file for jenkins server,  and save it as `jenkins-server.tf` , `jenkinsdata.sh` ,`jenkins.auto.tfvars.tf` , `jenkins_variables.tf` under the `infrastructure/jenkins-server
 
 * Create terraform file for jenkins-server.tf  
 ```go
@@ -261,7 +261,7 @@ variable "jenkins-role" {}
 * Search and select GitHub Integration, Docker, Docker Pipeline, Email Extension plugins, then click Install without restart. Note: No need to install the other Git plugin which is already installed can be seen under Installed tab.
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-##  STEP 3 - Run Petclinic locally [You can skip this step.]
+##  STEP 3 - Run App locally [You can skip this step.]
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 * Before preparing the microservice architecture, it is a best-practice method to manually check whether it works or not. 
