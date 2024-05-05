@@ -2,25 +2,25 @@
 
 ## Description
 
-This project aims to create full CI/CD Pipeline for microservices based applications using Spring Petclinic Microservices Application. [Spring Petclinic Microservices Application](https://github.com/spring-petclinic/spring-petclinic-htmx.git).
+This project aims to create full CI/CD Pipeline for microservice based applications using Spring Petclinic Microservices Application. Jenkins Server deployed on Elastic Compute Cloud (EC2) Instance is used as CI/CD Server to build pipelines. https://github.com/spring-projects/spring-petclinic.git
+
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 ##  STEP 1 - Prepair GitHub Repository for your proje 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
-
-* create a repo named ozguryzl-tasg. No readme.md.
+* create a private repo named ozgur-yzl-tasg. No readme.md.
 
 ``` bash
-git clone https://github.com/yakin68/ozguryzl-task.git 
+git clone https://github.com/yakin68/ozgur-yzl-task.git 
 ```
 
-* Connect to the [Spring Petclinic Microservices Application] (https://github.com/spring-petclinic/spring-petclinic-htmx.git. repo and copy the Spring Petclinic Microservices Application to the repo we created. If you want, you can "fork" or download the repo.
+* Connect to the [Spring Petclinic Microservices Application] {https://github.com/spring-projects/spring-petclinic.git} repo and copy the Spring Petclinic Microservices Application to the repo we created. If you want, you can "fork" or download the repo.
 
-* What should be taken into consideration here is to delete the ".git" directory in the "Spring Petclinic Microservices Application" report and the ".git" directory in the "git clone https://github.com/yakin68/ozguryzl-tasg.git" locale clone when copying the application. must. Otherwise, you may receive errors on the project. You need to do this if you want the project to be yours and you want to make changes to it.
+* What should be taken into consideration here is to delete the ".git" directory in the "Spring Petclinic Microservices Application" report and the ".git" directory in the "git clone https://github.com/yakin68/ozgur-yzl-task.git" locale clone when copying the application. must. Otherwise, you may receive errors on the project. You need to do this if you want the project to be yours and you want to make changes to it.
 
 ```bash
-cd ozguryzl-tasg
+cd ozgur-yzl-tasg
 rm -rf .git
 ```
 
@@ -32,52 +32,18 @@ git add .
 git config --global user.email "yakin68@gmail.com"
 git config --global user.name "yakin68"
 git commit -m "first commit"
-git remote add origin https://[github username]:[your-token]@github.com/yakin68/ozguryzl-tasg.git  
-```
-
-* Do not push the token to github and do not share it with anyone. *This command is used to add a remote repository to a Git repository. In the relevant example, a remote repository is added with the git remote add command. The name origin is usually used by default for the main remote repository. You specify your GitHub username in the [github username] section, your GitHub account's access token in the [your-token] section, and the repository address you want to add in the yakin68/ozguryzl-tasg.git section. If you use this command, you specify your GitHub username and If you insert your access token correctly, you will link a local Git repository to the remote repository "yakin68/ozguryzl-tasg" on GitHub. This allows you to push the changes you made locally to this remote repository and pull them from the remote repository to the local repository.
-
+git remote add origin https://[github username]:[your-token]@github.com/yakin68/ozgur-yzl-tasg.git  
 git push origin main
 ```
 
+* Do not push the token to github and do not share it with anyone. *This command is used to add a remote repository to a Git repository. In the relevant example, a remote repository is added with the git remote add command. The name origin is usually used by default for the main remote repository. You specify your GitHub username in the [github username] section, your GitHub account's access token in the [your-token] section, and the repository address you want to add in the yakin68/ozguryzl-task.git section. If you use this command, you specify your GitHub username and If you insert your access token correctly, you will link a local Git repository to the remote repository "yakin68/ozgur-yzl-task" on GitHub. This allows you to push the changes you made locally to this remote repository and pull them from the remote repository to the local repository.
+
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-##  STEP 2 - Terraform Dosyalarını Hazırlayın ve Uygulamayı manual test edelim. [ Bu adımı geçebilirsiniz.]
+##  STEP 2 - install jenkins-server 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-
-* Before preparing the microservice architecture, it is a best-practice method to manually check whether it works or not. You can also follow readme.md in the app's repo. For this purpose, 2 virtual machines were requested to be set up in the tag, 1 virtual machine will be deleted after it is created for testing.
-
-* Terraform files are prepared under 'infrastructure' in the (https://github.com/yakin68/ozguryzl-tasg.git) repo.
- 
-* Run the terraform files in the /infrastructure/test-of-petclinic folder. (This will stand up a virtual machine for testing.)
-   
-``` bash  
-  terraform init 
-  terraform apply -auto-approve
-```
-
-* connect to the virtual machine (either vscode or aws console etc.) and run the command below for app testing
-  
-``` bash  
-git clone https://github.com/spring-petclinic-htmx/spring-petclinic-htmx.git
-cd spring-petclinic-htmx
-./mvnw package
-java -jar target/*.jar
-```
-
-* When we examine readme.md in the [Spring Petclinic Microservices Application] repo, you will be able to get images with https://localhost:8080. You need to get the localhost here, the EC2 instance public ip that we set up for testing. After the image is taken, let's enter the command.
-
-``` bash  
-  terraform destroy -auto-approve
-```
-
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-##  STEP 3 - install jenkins-server 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-
 
 * Run the terraform files in the /infrastructure/jenkins-server folder. (This will create a virtual machine for the jenkin server.)
-
 
 ``` bash  
   terraform init 
@@ -85,7 +51,10 @@ java -jar target/*.jar
 ```
 
 * Get the initial administrative password.
-sudo cat /var/lib/jenkins/secrets/initialAdminPassword
+
+``` bash  
+  sudo cat /var/lib/jenkins/secrets/initialAdminPassword
+```
 * Enter the temporary password to unlock the Jenkins.
 
 * Install suggested plugins.
@@ -96,6 +65,23 @@ sudo cat /var/lib/jenkins/secrets/initialAdminPassword
 
 * Search and select GitHub Integration, Docker, Docker Pipeline, Email Extension plugins, then click Install without restart. Note: No need to install the other Git plugin which is already installed can be seen under Installed tab.
 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+##  STEP 3 - Run Petclinic locally [You can skip this step.]
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+* Before preparing the microservice architecture, it is a best-practice method to manually check whether it works or not. 
+* Spring Petclinic is a Spring Boot application built using Maven or Gradle. You can build a jar file and run it from the command line (it should work just as well with Java 17 or newer):
+
+* Create a job in Jenkins or connect to Jenkins server via SSH  
+* On the command line run
+``` bash  
+cd ozgur-yzl-task
+./mvnw package
+java -jar target/*.jar
+```
+
+* When we examine readme.md in the [Spring Petclinic Microservices Application] repo, you will be able to get images with https://localhost:8080. You need to get the localhost here, the EC2 instance public ip that we set up for Jenkins-server. 
+  
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 ## STEP 4 - Prepare Dockerfiles for Microservices 
@@ -116,7 +102,7 @@ ENTRYPOINT ["java", "-Djava.security.egd=file:/dev/./urandom","-jar","/app.jar"]
 ## STEP 5 -Prepare Automation Pipeline [environment]
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
-* Prepare environment, S3 bucket for HELM , Create ECR Repo for store, manage, and distribute Docker container images and save it under `jenkinsfile` file. 
+* Prepare environment, S3 bucket for HELM , Ansible, Create ECR Repo for store, manage, and distribute Docker container images and save it under `jenkinsfile` file. 
 
 ```
 pipeline {
@@ -127,8 +113,8 @@ pipeline {
         AWS_ACCOUNT_ID=sh(script:'aws sts get-caller-identity --query Account --output text', returnStdout:true).trim()
         AWS_REGION="us-east-1"
         ECR_REGISTRY="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
-        ANS_KEYPAIR="petclinic-${APP_NAME}-${BUILD_NUMBER}.key"
-        ANSIBLE_PRIVATE_KEY_FILE="${WORKSPACE}/${ANS_KEYPAIR}"
+        ANS_KEYPAIR="petclinic-${APP_NAME}-${BUILD_NUMBER}."
+        ANSIBLE_PRIVATE_KEY_FILE="${WORKSPACE}/${ANS_KEYPAIR}.pem"
         ANSIBLE_HOST_KEY_CHECKING="False"
     }
 ```
