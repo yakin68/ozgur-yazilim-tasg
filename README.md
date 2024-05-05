@@ -1,4 +1,4 @@
-# Microservices CI/CD Pipeline with Jenkin
+# Microservices CI/CD Pipeline with Jenkins
 
 ## Description
 
@@ -976,6 +976,12 @@ The `post` section in a Jenkins pipeline defines actions that should be taken af
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 ## STEP 14 - metalLB
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+
+```
+kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.14.5/config/manifests/metallb-native.yaml
+```
+kubectl describe ipaddresspools production -n metallb-system
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 ## STEP 14 - Install Rancher App on Kubernetes Cluster
