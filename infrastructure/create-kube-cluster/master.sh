@@ -37,14 +37,12 @@ chown ubuntu:ubuntu /home/ubuntu/.kube/config
 su - ubuntu -c 'kubectl apply -f https://github.com/coreos/flannel/raw/master/Documentation/kube-flannel.yml'
 su - ubuntu -c 'kubectl apply -f https://raw.githubusercontent.com/rancher/local-path-provisioner/v0.0.26/deploy/local-path-storage.yaml'
 sudo -i -u ubuntu kubectl patch storageclass local-path -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}'
-
+sudo -i -u ubuntu kubectl taint node kube-master node-role.kubernetes.io/control-plane:NoSchedule-
 sudo curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
 chmod 700 get_helm.sh
 sudo ./get_helm.sh
-
+sudo apt update
 sudo apt-get install python3-pip -y
 sudo pip3 install --upgrade pip
 sudo pip3 install boto3 botocore
-sudo apt update
-
 
