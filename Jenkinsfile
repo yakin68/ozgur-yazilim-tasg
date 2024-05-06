@@ -141,6 +141,9 @@ pipeline {
             sh 'docker image prune -af'
             echo 'Delete the Image Repository on ECR'
         }
+        success {
+            mail bcc: '', body: 'Congrats !!! CICD Pipeline is successfull.', cc: '', from: '', replyTo: '', subject: 'Test Mail', to: 'yakin68@gmail.com'
+            }        
         failure {
             sh """
                 aws ecr delete-repository \

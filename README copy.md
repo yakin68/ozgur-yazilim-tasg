@@ -2,7 +2,7 @@
 
 ## Description
 
-This project aims to create full CI/CD Pipeline for microservice based applications using Microservices Application. Jenkins Server deployed on Elastic Compute Cloud (EC2) Instance is used as CI/CD Server to build pipelines. 
+This project aims to create full CI/CD Pipeline for microservice based applications using Spring Petclinic Microservices Application. Jenkins Server deployed on Elastic Compute Cloud (EC2) Instance is used as CI/CD Server to build pipelines. https://github.com/spring-projects/spring-petclinic.git
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -15,9 +15,9 @@ This project aims to create full CI/CD Pipeline for microservice based applicati
 git clone https://github.com/yakin68/ozgur-yzl-tasg.git 
 ```
 
-* Connect to the [Spring Petclinic Microservices Application] {https://github.com/yakin68/ozgur-yzl-tasg.git} repo and copy the Spring Petclinic Microservices Application to the repo we created. If you want, you can "fork" or download the repo.
+* Connect to the [Spring Petclinic Microservices Application] {https://github.com/spring-projects/spring-petclinic.git} repo and copy the Spring Petclinic Microservices Application to the repo we created. If you want, you can "fork" or download the repo.
 
-* What should be taken into consideration here is to delete the ".git" directory in the "git clone https://github.com/yakin68/ozgur-yzl-tasg.git" locale clone when copying the application. must. Otherwise, you may receive errors on the project. You need to do this if you want the project to be yours and you want to make changes to it.
+* What should be taken into consideration here is to delete the ".git" directory in the "Spring Petclinic Microservices Application" report and the ".git" directory in the "git clone https://github.com/yakin68/ozgur-yzl-tasg.git" locale clone when copying the application. must. Otherwise, you may receive errors on the project. You need to do this if you want the project to be yours and you want to make changes to it.
 
 ```bash
 cd ozgur-yzl-tasg
@@ -102,9 +102,9 @@ resource "aws_security_group" "tf-jenkins-sec-gr" {
   }
 
   ingress {
-    from_port   = 80
+    from_port   = 8443
     protocol    = "tcp"
-    to_port     = 80
+    to_port     = 8443
     cidr_blocks = ["0.0.0.0/0"]
   }
 
@@ -261,14 +261,16 @@ variable "jenkins-role" {}
 * Search and select GitHub Integration, Docker, Docker Pipeline, Email Extension plugins, then click Install without restart. Note: No need to install the other Git plugin which is already installed can be seen under Installed tab.
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-##  STEP 3 - Run App locally
+##  STEP 3 - Run App locally [You can skip this step.]
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 * Before preparing the microservice architecture, it is a best-practice method to manually check whether it works or not. 
 * Spring Petclinic is a Spring Boot application built using Maven or Gradle. You can build a jar file and run it from the command line (it should work just as well with Java 17 or newer):
 
-* Create a job in Jenkins 
-```
+* Create a job in Jenkins or connect to Jenkins server via SSH  
+* On the command line run
+``` bash  
+cd ozgur-yzl-tasg
 ./mvnw package
 java -jar target/*.jar
 ```
@@ -951,8 +953,140 @@ The `post` section in a Jenkins pipeline defines actions that should be taken af
     }
 ```
 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+## STEP 17 - Setting Domain Name and TLS for Production Pipeline with Route 53
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+
+* Create an `A` record of `www.devopsproje.online` in your hosted zone (in our case `devopsproje.online`) using AWS Route 53 domain registrar and bind it to your `app cluster`.
+
+* Configure TLS(SSL) certificate for `www.devopsproje.online` using `cert-manager` on petclinic K8s cluster with the following steps.
+
+
+* Install the `cert-manager` on app cluster. See [Cert-Manager info](https://cert-manager.io/docs/).
+  * Create the namespace for cert-manager
+  ```bash
+    kubectl create namespace cert-manager
+  ```
+
+  * Add the Jetstack Helm repository and Update your local Helm chart repository.
+  ```bash
+  helm repo add jetstack https://charts.jetstack.io --force-update
+  helm repo update
+  ```
+
+  * Install the `Custom Resource Definition` resources separately
+  ```bash
+  kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.14.5/cert-manager.crds.yaml
+  ```
+
+  * Install the cert-manager Helm chart
+  ```bash
+    helm install \
+      cert-manager jetstack/cert-manager \
+      --namespace cert-manager \
+      --create-namespace \
+      --version v1.14.5 \
+      # --set installCRDs=true
+  ```
+
+  * Verify that the cert-manager is deployed correctly.
+  ```bash
+  kubectl get pods --namespace cert-manager -o wide
+  ```
+
+* Add the latest helm repository for the ingress-nginx
+ ```bash
+ helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+ helm repo update
+ helm install quickstart ingress-nginx/ingress-ngin
+ ```
+
+* Create this definition locally and update the email address to your own. This email is required by Let's Encrypt and used to notify you of certificate expiration and updates.
+
+```yaml
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: letsencrypt-staging
+  namespace: cert-manager
+spec:
+  acme:
+    # The ACME server URL
+    server: https://acme-staging-v02.api.letsencrypt.org/directory
+    # Email address used for ACME registration
+    email: user@example.com
+    # Name of a secret used to store the ACME account private key
+    privateKeySecretRef:
+      name: letsencrypt-staging
+    # Enable the HTTP-01 challenge provider
+    solvers:
+      - http01:
+          ingress:
+            ingressClassName: nginx
+
+---
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: letsencrypt-prod
+  namespace: cert-manager
+spec:
+  acme:
+    # The ACME server URL
+    server: https://acme-v02.api.letsencrypt.org/directory
+    # Email address used for ACME registration
+    email: yakin68@gmail.com
+    # Name of a secret used to store the ACME account private key
+    privateKeySecretRef:
+      name: letsencrypt-prod
+    # Enable the HTTP-01 challenge provider
+    solvers:
+      - http01:
+          ingress:
+            ingressClassName: nginx
+---                        
+```
+* Check if `Issuer` resource is created.
+
+```bash
+kubectl apply -f tls-cluster-issuer-prod.yml
+kubectl get clusterissuers letsencrypt-prod -n cert-manager -o wide
+```
+* An Ingress resource is what Kubernetes uses to expose this example service outside the cluster. You will need to download and modify the example manifest to reflect the domain that you own or control to complete this example.
+* Issue production Let’s Encrypt Certificate by annotating and adding the `api-gateway` ingress resource
+```yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: api-gateway
+  namespace: ozguryzl-dev
+  annotations:
+    cert-manager.io/issuer: "letsencrypt-staging"  
+spec:
+  ingressClassName: nginx
+  tls:
+  - hosts:
+    - www.devopsproje.online
+    secretName: ozguryzl-tls  
+  rules:
+    - host: '{{ .Values.DNS_NAME }}'
+      http:
+        paths:
+        - pathType: Prefix
+          path: /
+          backend:
+            service:
+              name: ozguryzl-service
+              port:
+                number: 8080
+```
+
+* Check and verify that the TLS(SSL) certificate created and successfully issued to `www.devopsproje.online` by checking URL of `https://www.devopsproje.online`
+
+
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-## STEP 17 -  Send to mail success
+## STEP 18 -  Send to mail success
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 ```
         success {
@@ -960,113 +1094,102 @@ The `post` section in a Jenkins pipeline defines actions that should be taken af
             }
 ```
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-## STEP 18 - Prepair NGINX Reverse Proxy for www.devopsproje.online
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-
-* Connect to kube-master server via ssh or AWS dashboard
-* The first step is to install NGINX on our system. If you are using a Linux-based system, you can usually install NGINX through your package manager
-```
-sudo apt update
-sudo apt install nginx -y
-```
-
-* Edit Configuration File: We will define the reverse proxy configuration by editing NGINX's configuration file. This file is usually located in a place like /etc/nginx/nginx.conf or /etc/nginx/sites-available/default
-```
-sudo rm -rf /etc/nginx/sites-available/default
-sudo nano /etc/nginx/sites-available/default
-```
-* Add a Short Proxy Definition: Add the main server definition that will receive requests to the NGINX configuration file. In this definition, we will redirect incoming requests to a specific server or application.
-```
-server {
-    listen 80;
-    server_name www.devopsproje.online;
-
-    location / {
-        proxy_pass http://54.91.196.114:30001/;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-    }
-}
-
-server {
-    listen 80;
-    server_name 54.91.196.114;
-
-    location / {
-        proxy_pass http://54.91.196.114:30001/;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-    }
-}
-
-```
-Check Configuration and Restart NGINX: You can use the following commands to check the configuration file and test if NGINX is running correctly.
-```
-sudo nginx -t
-sudo systemctl restart nginx
-
-```
-
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-## STEP 19 - Prepair NGINX Reverse Proxy for jenkins server
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-
-* Connect to jenkins server via ssh or AWS dashboard
-* The first step is to install NGINX on our system. If you are using a Linux-based system, you can usually install NGINX through your package manager
-```
-sudo apt update
-sudo apt install nginx -y
-```
-
-* Edit Configuration File: We will define the reverse proxy configuration by editing NGINX's configuration file. This file is usually located in a place like /etc/nginx/nginx.conf or /etc/nginx/sites-available/default
-```
-sudo rm -rf /etc/nginx/sites-available/default
-sudo nano /etc/nginx/sites-available/default
-```
-* Add a Short Proxy Definition: Add the main server definition that will receive requests to the NGINX configuration file. In this definition, we will redirect incoming requests to a specific server or application.
-```
-server {
-    listen 80;
-    server_name 3.239.128.187;
-
-    location / {
-        proxy_pass http://3.239.128.187:8080/;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-    }
-}
-```
-
-Check Configuration and Restart NGINX: You can use the following commands to check the configuration file and test if NGINX is running correctly.
-```
-sudo nginx -t
-sudo systemctl restart nginx
-
-```
-
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-## STEP 20 - Enable SSL in Jenkins Server -Setting Domain Name and TLS for Production Pipeline with Route 53
+## STEP 19 - Enable SSL in Jenkins Server
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
-* Cloudflare provides SSL support and is generally a preferred solution by users. Cloudflare offers advanced features for SSL/TLS encryption and security for your website. Some advantages of Cloudflare include: 1. Free SSL Certificates: Cloudflare provides free SSL/TLS certificates to encrypt your website traffic. This ensures a secure connection by enabling your website to use the HTTPS protocol.
+* Connect root on jenkins server shell
+```
+sudo su -
+nano /etc/default/jenkins
 
-* First move your domain to cloudflare
+# port for HTTP connector (default 8080; disable with -1)
+HTTP_PORT=8443
+
+systemctl restart jenkins
+cd /var/lib/jenkins/
+mkdir .ssl
+cd .ssl/
+
+openssl can manually generate certificates for your jenkins server.
+
+Generate a jenkins.devopsproje.online.key with 2048bit:
+openssl genrsa -out jenkins.devopsproje.online.key 2048
+
+According to the jenkins.devopsproje.online.key generate a jenkins.devopsproje.online.crt (use -days to set the certificate effective time):
+openssl req -x509 -new -nodes -key jenkins.devopsproje.online.key -days 10000 -out jenkins.devopsproje.online.crt
+
+  Country Name (2 letter code) [AU]:US
+  State or Province Name (full name) [Some-State]:Yucel
+  Locality Name (eg, city) []:Turkey
+  Organization Name (eg, company) [Internet Widgits Pty Ltd]:Yakin
+  Organizational Unit Name (eg, section) []:YakinOrg
+  Common Name (e.g. server FQDN or YOUR name) []:jenkins.devopsproje.online
+  Email Address []:yakin68@gmail.com
+```
+```
+chown -R jenkins:jenkins /var/lib/jenkins
+nano /etc/default/jenkins
+
+JENKINS_ARGS="--webroot=/var/cache/$NAME/war --httpPort=$HTTP_PORT --httpsPrivateKey=/var/lib/jenkins/.ssl/jenkins.devopsproje.online.key --httpsCertificate=/var/lib/jenkins/.ssl/jenkins.devopsproje.online.crt"
+
+systemctl restart jenkins
+
+nano /etc/default/jenkins
+HTTP_PORT="-1"
+
+systemctl restart jenkins
+
+apt install firewalld -y
+firewall-cmd --zone=public --add-service=https
+firewall-cmd --add-forward-port=port=443:proto=tcp:toport=8080
+firewall-cmd --list-forward-ports
+firewall-cmd --runtime-to-permanent
+firewall-cmd --reload
+
+Jenkins-->Manage Jenkins --> System Configuration --> Jenkins URL --> https://jenkins.devopsproje.online
+```
+
+Generate a server.key with 2048bit:
+openssl genrsa -out server.key 2048
+
+Generate the certificate signing request based on the config file:
+openssl req -new -key server.key -out server.csr -config csr.conf
+
+Generate the server certificate using the ca.key, ca.crt and server.csr:
+
+openssl x509 -req -in server.csr -CA ca.crt -CAkey ca.key \
+    -CAcreateserial -out server.crt -days 10000 \
+    -extensions v3_ext -extfile csr.conf -sha256
+
+View the certificate signing request:
+openssl req  -noout -text -in ./server.csr
+
+View the certificate:
+openssl x509  -noout -text -in ./server.crt
+
+
+vi jenkins.devopsproje.online.key
+vi jenkins.devopsproje.online.crt
+```
+* Get free ssl certifica https://zerossl.com/ , Based on your selection of a 90-Day SSL Certificate you are fine staying on the Free Plan.
+To create and validate your SSL Certificate, please click "Next Step" below for jenkins.devopsproje.com domain name
   
-* Create and save A record for jenkins.devopsproje.online and www.devopsproje.com
-  
-* Choose SSL/TSL --> Overview --> Your SSL/TLS encryption mode is Flexible
+ * To verify your domain using a CNAME record, please follow the steps below on AWS Route53:
+```
+Sign in to your DNS provider, typically the registrar of your domain.
+Navigate to the section where DNS records are managed.
+Add the following CNAME record:
+Name : _F4CA01DE872A9E8FC2436FE4C3B44AFB.jenkins.devopsproje.com
+Point To : 3CB088F609584D6C382404EBEC4E69B8.BA0DEE4FAEB30305100A03AD08629A74.cc66f8e0ad91c55.comodoca.com
+TTL : 3600 (or lower)
+Save your CNAME record and click "Next Step" to continue.
+```
+```
 
-* You can try different solutions, for example, you can create your own password with openssl and get 90-day free SSL certificates from https://app.zerossl.com/dashboard.
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-## THE FINAL STEP 21 - Prepair github token after this proje 
+## THE FINAL STEP 20 - Prepair github token after this proje 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 ```
@@ -1079,36 +1202,6 @@ sudo systemctl restart nginx
 * create
 ```
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # #
-## STEP 22 - configure Email Notification in Jenkins | Send Email using Gmail SMTP server
-# # # # # # # # # # # # # # # # # # # # # # # # # # # #
-
-* Configure Email Notification in Jenkins | Send Email using Gmail SMTP server
-  
-```
-* Go to your Google Account.
-Select Security.
-Under "Signing in to Google," select 2-Step Verification.
-At the bottom of the page, select App passwords.
-Enter a name that helps you remember where you’ll use the app password.
-Select Generate.
-Add the app password for SMTP GMAIL account instead of your GMAIL account password
-```
-
-``` 
-Go to the Jenkins home page and click Manage Jenkins.
-Select Configure System.
-Scroll down to the Email Notification section.
-Enter the SMTP server name as smtp.gmail.com.
-Click Advanced.
-Select Use SMTP Authentication.
-Enter your Gmail ID and password.
-Select Use SSL.
-Enter 465 as the SMTP port.
-Enter your email ID as the Reply-to-Address.
-Send Test Email from Jenkins- Output --> Email was successfully sent
-Click Save.
-```
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 ## STEP 14 - Install Rancher App on Kubernetes Cluster
