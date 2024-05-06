@@ -977,34 +977,33 @@ sudo rm -rf /etc/nginx/sites-available/default
 sudo nano /etc/nginx/sites-available/default
 ```
 * Add a Short Proxy Definition: Add the main server definition that will receive requests to the NGINX configuration file. In this definition, we will redirect incoming requests to a specific server or application.
-```
-server {
-    listen 80;
-    server_name www.devopsproje.online;
 
-    location / {
-        proxy_pass http://54.91.196.114:30001/;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-    }
-}
+# server {
+#    listen 80;
+#    server_name www.devopsproje.online;
+#
+#    location / {
+#        proxy_pass http://54.91.196.114:30001/;
+#        proxy_set_header Host $host;
+#        proxy_set_header X-Real-IP $remote_addr;
+#        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+#        proxy_set_header X-Forwarded-Proto $scheme;
+#    }
+#}
 
-server {
-    listen 80;
-    server_name 54.91.196.114;
+# server {
+#    listen 80;
+#    server_name 54.91.196.114;
 
-    location / {
-        proxy_pass http://54.91.196.114:30001/;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-    }
-}
+#    location / {
+#        proxy_pass http://54.91.196.114:30001/;
+#        proxy_set_header Host $host;
+#        proxy_set_header X-Real-IP $remote_addr;
+#        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+#        proxy_set_header X-Forwarded-Proto $scheme;
+#    }
+# }
 
-```
 Check Configuration and Restart NGINX: You can use the following commands to check the configuration file and test if NGINX is running correctly.
 ```
 sudo nginx -t
@@ -1029,20 +1028,20 @@ sudo rm -rf /etc/nginx/sites-available/default
 sudo nano /etc/nginx/sites-available/default
 ```
 * Add a Short Proxy Definition: Add the main server definition that will receive requests to the NGINX configuration file. In this definition, we will redirect incoming requests to a specific server or application.
-```
-server {
-    listen 80;
-    server_name 3.239.128.187;
 
-    location / {
-        proxy_pass http://3.239.128.187:8080/;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-    }
-}
-```
+# server {
+#    listen 80;
+#    server_name 3.239.128.187;
+
+#    location / {
+#        proxy_pass http://3.239.128.187:8080/;
+#        proxy_set_header Host $host;
+#        proxy_set_header X-Real-IP $remote_addr;
+#        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+#        proxy_set_header X-Forwarded-Proto $scheme;
+#    }
+# }
+
 
 Check Configuration and Restart NGINX: You can use the following commands to check the configuration file and test if NGINX is running correctly.
 ```
@@ -1066,7 +1065,7 @@ sudo systemctl restart nginx
 * You can try different solutions, for example, you can create your own password with openssl and get 90-day free SSL certificates from https://app.zerossl.com/dashboard.
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-## THE FINAL STEP 21 - Prepair github token after this proje 
+## STEP 21 - Prepair github token after this proje 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 ```
@@ -1080,7 +1079,7 @@ sudo systemctl restart nginx
 ```
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-## STEP 22 - configure Email Notification in Jenkins | Send Email using Gmail SMTP server
+## THE FINAL STEP 22 - configure Email Notification in Jenkins | Send Email using Gmail SMTP server
 # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 * Configure Email Notification in Jenkins | Send Email using Gmail SMTP server
@@ -1099,7 +1098,7 @@ Add the app password for SMTP GMAIL account instead of your GMAIL account passwo
 Go to the Jenkins home page and click Manage Jenkins.
 Select Configure System.
 Scroll down to the Email Notification section.
-Enter the SMTP server name as smtp.gmail.com.
+Enter the SMTP server name as smtp.gmail.com
 Click Advanced.
 Select Use SMTP Authentication.
 Enter your Gmail ID and password.
@@ -1111,9 +1110,9 @@ Click Save.
 ```
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-## STEP 14 - Install Rancher App on Kubernetes Cluster
+## STEP 23 - Install Rancher App on Kubernetes Cluster
 # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-## STEP 14 - Monitoring with Prometheus and Grafana
+## STEP 24 - Monitoring with Prometheus and Grafana
 # # # # # # # # # # # # # # # # # # # # # # # # # # # #
