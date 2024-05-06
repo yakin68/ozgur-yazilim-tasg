@@ -575,6 +575,7 @@ status:
 ## STEP 10 - Prepare to connect mysql for Kubernetes Cluster
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
+* See application features documentation
 ```bash
 cd /src/main/resources/
 sed -i "s/localdost/mysql-server/g" application-mysql.properties
@@ -853,7 +854,7 @@ compose:
 * Create Ansible playbook for deploying application as `dev-ozguryzl-deploy-template` under `ansible/playbooks` folder.
 * 
 ```yaml
-- hosts: all
+- hosts: all_instances_kube_master
   tasks:
 
   - name: Create .docker folder
