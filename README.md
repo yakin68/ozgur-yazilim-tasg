@@ -952,6 +952,139 @@ The `post` section in a Jenkins pipeline defines actions that should be taken af
         }
     }
 ```
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+## STEP 17 - Setting Domain Name and TLS for Production Pipeline with Route 53
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+
+* Create an `A` record of `www.devopsproje.online` in your hosted zone (in our case `devopsproje.online`) using AWS Route 53 domain registrar and bind it to your `app cluster`.
+
+* Configure TLS(SSL) certificate for `www.devopsproje.online` using `cert-manager` on petclinic K8s cluster with the following steps.
+
+
+* Install the `cert-manager` on app cluster. See [Cert-Manager info](https://cert-manager.io/docs/).
+  * Create the namespace for cert-manager
+  ```bash
+    kubectl create namespace cert-manager
+  ```
+
+  * Add the Jetstack Helm repository and Update your local Helm chart repository.
+  ```bash
+  helm repo add jetstack https://charts.jetstack.io --force-update
+  helm repo update
+  ```
+
+  * Install the `Custom Resource Definition` resources separately
+  ```bash
+  kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.14.5/cert-manager.crds.yaml
+  ```
+
+  * Install the cert-manager Helm chart
+  ```bash
+    helm install \
+      cert-manager jetstack/cert-manager \
+      --namespace cert-manager \
+      --create-namespace \
+      --version v1.14.5 \
+      # --set installCRDs=true
+  ```
+
+  * Verify that the cert-manager is deployed correctly.
+  ```bash
+  kubectl get pods --namespace cert-manager -o wide
+  ```
+
+* Add the latest helm repository for the ingress-nginx
+ ```bash
+ helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+ helm repo update
+ helm install quickstart ingress-nginx/ingress-ngin
+ ```
+
+* Create this definition locally and update the email address to your own. This email is required by Let's Encrypt and used to notify you of certificate expiration and updates.
+
+```yaml
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: letsencrypt-staging
+  namespace: cert-manager
+spec:
+  acme:
+    # The ACME server URL
+    server: https://acme-staging-v02.api.letsencrypt.org/directory
+    # Email address used for ACME registration
+    email: user@example.com
+    # Name of a secret used to store the ACME account private key
+    privateKeySecretRef:
+      name: letsencrypt-staging
+    # Enable the HTTP-01 challenge provider
+    solvers:
+      - http01:
+          ingress:
+            ingressClassName: nginx
+
+---
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: letsencrypt-prod
+  namespace: cert-manager
+spec:
+  acme:
+    # The ACME server URL
+    server: https://acme-v02.api.letsencrypt.org/directory
+    # Email address used for ACME registration
+    email: yakin68@gmail.com
+    # Name of a secret used to store the ACME account private key
+    privateKeySecretRef:
+      name: letsencrypt-prod
+    # Enable the HTTP-01 challenge provider
+    solvers:
+      - http01:
+          ingress:
+            ingressClassName: nginx
+---                        
+```
+* Check if `Issuer` resource is created.
+
+```bash
+kubectl apply -f tls-cluster-issuer-prod.yml
+kubectl get clusterissuers letsencrypt-prod -n cert-manager -o wide
+```
+* An Ingress resource is what Kubernetes uses to expose this example service outside the cluster. You will need to download and modify the example manifest to reflect the domain that you own or control to complete this example.
+* Issue production Let’s Encrypt Certificate by annotating and adding the `api-gateway` ingress resource
+```yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: api-gateway
+  namespace: ozguryzl-dev
+  annotations:
+    cert-manager.io/issuer: "letsencrypt-staging"  
+spec:
+  ingressClassName: nginx
+  tls:
+  - hosts:
+    - www.devopsproje.online
+    secretName: ozguryzl-tls  
+  rules:
+    - host: '{{ .Values.DNS_NAME }}'
+      http:
+        paths:
+        - pathType: Prefix
+          path: /
+          backend:
+            service:
+              name: ozguryzl-service
+              port:
+                number: 8080
+```
+
+* Check and verify that the TLS(SSL) certificate created and successfully issued to `www.devopsproje.online` by checking URL of `https://www.devopsproje.online`
+
+
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 ## STEP 17 -  Send to mail success
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -960,6 +1093,99 @@ The `post` section in a Jenkins pipeline defines actions that should be taken af
             mail bcc: '', body: 'Congrats !!! CICD Pipeline is successfull.', cc: '', from: '', replyTo: '', subject: 'Test Mail', to: 'yakin68@gmail.com'
             }
 ```
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+## STEP 14 - Enable SSL in Jenkins Server
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+* Connect root on jenkins server shell
+```
+sudo su -
+nano /etc/default/jenkins
+
+# port for HTTP connector (default 8080; disable with -1)
+HTTP_PORT=8443
+
+systemctl restart jenkins
+cd /var/lib/jenkins/
+mkdir .ssl
+cd .ssl/
+
+openssl can manually generate certificates for your jenkins server.
+
+Generate a jenkins.devopsproje.online.key with 2048bit:
+openssl genrsa -out jenkins.devopsproje.online.key 2048
+
+According to the jenkins.devopsproje.online.key generate a jenkins.devopsproje.online.crt (use -days to set the certificate effective time):
+openssl req -x509 -new -nodes -key jenkins.devopsproje.online.key -days 10000 -out jenkins.devopsproje.online.crt
+
+  Country Name (2 letter code) [AU]:US
+  State or Province Name (full name) [Some-State]:Yucel
+  Locality Name (eg, city) []:Turkey
+  Organization Name (eg, company) [Internet Widgits Pty Ltd]:Yakin
+  Organizational Unit Name (eg, section) []:YakinOrg
+  Common Name (e.g. server FQDN or YOUR name) []:jenkins.devopsproje.online
+  Email Address []:yakin68@gmail.com
+```
+```
+chown -R jenkins:jenkins /var/lib/jenkins
+nano /etc/default/jenkins
+
+JENKINS_ARGS="--webroot=/var/cache/$NAME/war --httpPort=$HTTP_PORT --httpsPrivateKey=/var/lib/jenkins/.ssl/jenkins.devopsproje.online.key --httpsCertificate=/var/lib/jenkins/.ssl/jenkins.devopsproje.online.crt"
+
+systemctl restart jenkins
+
+nano /etc/default/jenkins
+HTTP_PORT="-1"
+
+systemctl restart jenkins
+
+apt install firewalld -y
+firewall-cmd --zone=public --add-service=https
+firewall-cmd --add-forward-port=port=443:proto=tcp:toport=8443
+firewall-cmd --list-forward-posts
+firewall-cmd --runtime-to-permanent
+firewall-cmd --reload
+
+Jenkins-->Manage Jenkins --> System Configuration --> Jenkins URL --> https://jenkins.devopsproje.online
+```
+
+Generate a server.key with 2048bit:
+openssl genrsa -out server.key 2048
+
+Generate the certificate signing request based on the config file:
+openssl req -new -key server.key -out server.csr -config csr.conf
+
+Generate the server certificate using the ca.key, ca.crt and server.csr:
+
+openssl x509 -req -in server.csr -CA ca.crt -CAkey ca.key \
+    -CAcreateserial -out server.crt -days 10000 \
+    -extensions v3_ext -extfile csr.conf -sha256
+
+View the certificate signing request:
+openssl req  -noout -text -in ./server.csr
+
+View the certificate:
+openssl x509  -noout -text -in ./server.crt
+
+
+vi jenkins.devopsproje.online.key
+vi jenkins.devopsproje.online.crt
+```
+* Get free ssl certifica https://zerossl.com/ , Based on your selection of a 90-Day SSL Certificate you are fine staying on the Free Plan.
+To create and validate your SSL Certificate, please click "Next Step" below for jenkins.devopsproje.com domain name
+  
+ * To verify your domain using a CNAME record, please follow the steps below on AWS Route53:
+```
+Sign in to your DNS provider, typically the registrar of your domain.
+Navigate to the section where DNS records are managed.
+Add the following CNAME record:
+Name : _F4CA01DE872A9E8FC2436FE4C3B44AFB.jenkins.devopsproje.com
+Point To : 3CB088F609584D6C382404EBEC4E69B8.BA0DEE4FAEB30305100A03AD08629A74.cc66f8e0ad91c55.comodoca.com
+TTL : 3600 (or lower)
+Save your CNAME record and click "Next Step" to continue.
+```
+
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 ## THE FINAL STEP 18 - Prepair github token after this proje 
@@ -976,7 +1202,6 @@ The `post` section in a Jenkins pipeline defines actions that should be taken af
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 ## STEP 14 - metalLB
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-
 
 ```
 kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.14.5/config/manifests/metallb-native.yaml
