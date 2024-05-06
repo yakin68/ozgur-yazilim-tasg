@@ -894,10 +894,10 @@ ansible-playbook -i ./ansible/inventory/dynamic_inventory_aws_ec2.yaml ./ansible
 ```
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-## STEP 15 - Destroy the infrastructure
+## STEP 15 - Take a standby step
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
-* Prepair to stage and get approval for destroy the infrastructure 
+* Take a standby step to examine the infrastructure, develop the application and secure it.
 
 ```bash
         stage('Destroy the infrastructure'){
@@ -905,58 +905,42 @@ ansible-playbook -i ./ansible/inventory/dynamic_inventory_aws_ec2.yaml ./ansible
                 timeout(time:5, unit:'DAYS'){
                     input message:'Approve terminate'
                 }
-                sh """
-                docker image prune -af
-                aws ecr delete-repository \
-                  --repository-name ${APP_REPO_NAME} \
-                  --region ${AWS_REGION} \
-                  --force
-                """
-                echo 'Tear down the Kubernetes Cluster'
-                sh """
-                cd infrastructure/create-kube-cluster
-                terraform destroy -auto-approve -no-color
-                """                
-            }
         }  
 ```           
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-## STEP 16 - Deleting all local images and Send to mail success
+## STEP 16 - Deleting all local images and Destroy the infrastructure
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 * 
-The `post` section in a Jenkins pipeline defines actions that should be taken after the main build steps have completed. Within the `post` section, there are two commonly used blocks:
+The `post` section in a Jenkins pipeline defines actions that should be taken after the main build steps have completed. 
+**`always`:** This block contains actions that should be executed regardless of whether the build succeeded or failed. It ensures that certain cleanup or post-processing tasks are always performed, irrespective of the build result.
 
-1. **`always`:** This block contains actions that should be executed regardless of whether the build succeeded or failed. It ensures that certain cleanup or post-processing tasks are always performed, irrespective of the build result.
-2. **`failure`:**The failure block within the post section of a Jenkins pipeline is a specific section where you define actions to be executed only if the build fails. This block allows you to handle the failure scenario by performing tasks such as cleanup operations, sending notifications, logging error messages, or triggering further actions to address the failure.
 
 ```
     post {
         always {
             echo 'Deleting all local images'
             sh 'docker image prune -af'
+
             echo 'Delete the Image Repository on ECR'
-        }
-        failure {
-            sh """
-                aws ecr delete-repository \
+            sh """                aws ecr delete-repository \
                   --repository-name ${APP_REPO_NAME} \
                   --region ${AWS_REGION}\
                   --force
-                """
+            """
+
             echo 'Tear down the Kubernetes Cluster'
             sh """
             cd infrastructure/create-kube-cluster
             terraform destroy -auto-approve -no-color
+            rm -rf .terraform 
             """
             echo "Delete existing key pair using AWS CLI"
             sh "aws ec2 delete-key-pair --region ${AWS_REGION} --key-name ${ANS_KEYPAIR}"
-            sh "rm -rf ${ANS_KEYPAIR}.pem"
-         
-
+            sh "rm -rf ${ANS_KEYPAIR}.pem"            
         }
-    }
+    }    
 ```
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #

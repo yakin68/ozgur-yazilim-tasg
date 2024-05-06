@@ -111,7 +111,7 @@ pipeline {
             }
         } 
 
-        stage('Destroy the infrastructure'){
+        stage('Take a standby step'){
             steps{
                 timeout(time:5, unit:'DAYS'){
                     input message:'Approve terminate'
