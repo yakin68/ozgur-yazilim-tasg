@@ -1061,9 +1061,23 @@ sudo systemctl restart nginx
 ## STEP 21 - Prepair github token after this proje 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
+* GitHub token is an authentication mechanism used to access GitHub's API (Application Programming Interface) on behalf of a user or a GitHub application. Tokens are typically used for automation, such as when integrating GitHub with other services or when performing repetitive tasks programmatically.
+
+*Here's how you can generate a personal access token on GitHub:
 ```
-* create token from github
-* Move the yout project to private repo
+Go to your GitHub account settings.
+Navigate to the "Developer settings" section.
+Click on "Personal access tokens".
+Click the "Generate new token" button.
+Give your token a descriptive name and select the desired scopes (permissions) for the token.
+Click "Generate token" and authenticate if prompted.
+Copy the generated token and securely store it. GitHub will not show it to you again.
+You can then use this token in your scripts or applications to authenticate with GitHub's API. Make sure to keep your token secure and avoid sharing it publicly, as it grants access to your GitHub account based on the permissions you've assigned to it.
+```
+
+* Move the your project to private repo and prepair Jenkins Manege
+
+```
 * Jenkins Deashboard/Manege Jenkins/Credentials/System/Global credentials(unrestricted)/Add Credentials
 * Username: copy your github token name
 * Password: copy your github token 
