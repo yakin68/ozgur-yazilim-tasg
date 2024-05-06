@@ -8,7 +8,7 @@ data "aws_region" "current" {}
 
 locals {
   # change here, optional
-  name = "ozgur-yazilim"
+  name = "ozgur-yaz"
   keyname = "yaksonkey"
   instancetype = "t3a.medium"
   ami = "ami-0e001c9271cf7f3b9"
