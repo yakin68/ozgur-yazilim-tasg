@@ -1086,7 +1086,7 @@ spec:
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-## STEP 17 -  Send to mail success
+## STEP 18 -  Send to mail success
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 ```
         success {
@@ -1095,7 +1095,7 @@ spec:
 ```
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-## STEP 14 - Enable SSL in Jenkins Server
+## STEP 19 - Enable SSL in Jenkins Server
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 * Connect root on jenkins server shell
@@ -1142,8 +1142,8 @@ systemctl restart jenkins
 
 apt install firewalld -y
 firewall-cmd --zone=public --add-service=https
-firewall-cmd --add-forward-port=port=443:proto=tcp:toport=8443
-firewall-cmd --list-forward-posts
+firewall-cmd --add-forward-port=port=443:proto=tcp:toport=8080
+firewall-cmd --list-forward-ports
 firewall-cmd --runtime-to-permanent
 firewall-cmd --reload
 
@@ -1185,12 +1185,14 @@ Point To : 3CB088F609584D6C382404EBEC4E69B8.BA0DEE4FAEB30305100A03AD08629A74.cc6
 TTL : 3600 (or lower)
 Save your CNAME record and click "Next Step" to continue.
 ```
+```
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-## THE FINAL STEP 18 - Prepair github token after this proje 
+## THE FINAL STEP 20 - Prepair github token after this proje 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
+```
 * create token from github
 * Move the yout project to private repo
 * Jenkins Deashboard/Manege Jenkins/Credentials/System/Global credentials(unrestricted)/Add Credentials
@@ -1198,15 +1200,8 @@ Save your CNAME record and click "Next Step" to continue.
 * Password: copy your github token 
 * Description: github
 * create
-
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-## STEP 14 - metalLB
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-
 ```
-kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.14.5/config/manifests/metallb-native.yaml
-```
-kubectl describe ipaddresspools production -n metallb-system
+
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 ## STEP 14 - Install Rancher App on Kubernetes Cluster
