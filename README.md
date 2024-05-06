@@ -969,32 +969,33 @@ sudo rm -rf /etc/nginx/sites-available/default
 sudo nano /etc/nginx/sites-available/default
 ```
 * Add a Short Proxy Definition: Add the main server definition that will receive requests to the NGINX configuration file. In this definition, we will redirect incoming requests to a specific server or application.
+```
+ server {
+    listen 80;
+    server_name www.devopsproje.online;
 
-# server {
-#    listen 80;
-#    server_name www.devopsproje.online;
-#
-#    location / {
-#        proxy_pass https://54.91.196.114:30001/;
-#        proxy_set_header Host $host;
-#        proxy_set_header X-Real-IP $remote_addr;
-#        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-#        proxy_set_header X-Forwarded-Proto $scheme;
-#    }
-#}
+    location / {
+        proxy_pass https://54.91.196.114:30001/;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
 
-# server {
-#    listen 80;
-#    server_name 54.91.196.114;
+ server {
+    listen 80;
+    server_name 54.91.196.114;
 
-#    location / {
-#        proxy_pass https://54.91.196.114:30001/;
-#        proxy_set_header Host $host;
-#        proxy_set_header X-Real-IP $remote_addr;
-#        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-#        proxy_set_header X-Forwarded-Proto $scheme;
-#    }
-# }
+    location / {
+        proxy_pass https://54.91.196.114:30001/;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+ }
+```
 
 Check Configuration and Restart NGINX: You can use the following commands to check the configuration file and test if NGINX is running correctly.
 ```
@@ -1020,20 +1021,20 @@ sudo rm -rf /etc/nginx/sites-available/default
 sudo nano /etc/nginx/sites-available/default
 ```
 * Add a Short Proxy Definition: Add the main server definition that will receive requests to the NGINX configuration file. In this definition, we will redirect incoming requests to a specific server or application.
+```
+ server {
+    listen 80;
+    server_name 3.239.128.187;
 
-# server {
-#    listen 80;
-#    server_name 3.239.128.187;
-
-#    location / {
-#        proxy_pass https://3.239.128.187:8080/;
-#        proxy_set_header Host $host;
-#        proxy_set_header X-Real-IP $remote_addr;
-#        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-#        proxy_set_header X-Forwarded-Proto $scheme;
-#    }
-# }
-
+    location / {
+        proxy_pass https://3.239.128.187:8080/;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+ }
+```
 
 Check Configuration and Restart NGINX: You can use the following commands to check the configuration file and test if NGINX is running correctly.
 ```
