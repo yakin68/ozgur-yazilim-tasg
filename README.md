@@ -983,7 +983,7 @@ sudo nano /etc/nginx/sites-available/default
 #    server_name www.devopsproje.online;
 #
 #    location / {
-#        proxy_pass http://54.91.196.114:30001/;
+#        proxy_pass https://54.91.196.114:30001/;
 #        proxy_set_header Host $host;
 #        proxy_set_header X-Real-IP $remote_addr;
 #        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -996,7 +996,7 @@ sudo nano /etc/nginx/sites-available/default
 #    server_name 54.91.196.114;
 
 #    location / {
-#        proxy_pass http://54.91.196.114:30001/;
+#        proxy_pass https://54.91.196.114:30001/;
 #        proxy_set_header Host $host;
 #        proxy_set_header X-Real-IP $remote_addr;
 #        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -1034,7 +1034,7 @@ sudo nano /etc/nginx/sites-available/default
 #    server_name 3.239.128.187;
 
 #    location / {
-#        proxy_pass http://3.239.128.187:8080/;
+#        proxy_pass https://3.239.128.187:8080/;
 #        proxy_set_header Host $host;
 #        proxy_set_header X-Real-IP $remote_addr;
 #        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
