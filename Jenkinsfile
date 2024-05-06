@@ -116,22 +116,7 @@ pipeline {
                 timeout(time:5, unit:'DAYS'){
                     input message:'Approve terminate'
                 }
-                sh """
-                docker image prune -af
-                aws ecr delete-repository \
-                  --repository-name ${APP_REPO_NAME} \
-                  --region ${AWS_REGION} \
-                  --force
-                """
-                echo 'Tear down the Kubernetes Cluster'
-                sh """
-                cd infrastructure/create-kube-cluster
-                terraform destroy -auto-approve -no-color
-                rm -rf .terraform
-                rm -rf .terraform.lock.hcl
-                rm -rf terraform.tfstate
-                rm -rf terraform.tfstate.backup
-                """                
+           
             }
         }                 
     }
@@ -139,32 +124,26 @@ pipeline {
         always {
             echo 'Deleting all local images'
             sh 'docker image prune -af'
+
             echo 'Delete the Image Repository on ECR'
-        }
-        success {
-            mail bcc: '', body: 'Congrats !!! CICD Pipeline is successfull.', cc: '', from: '', replyTo: '', subject: 'Test Mail', to: 'yakin68@gmail.com'
-            }        
-        failure {
-            sh """
-                aws ecr delete-repository \
+            sh """                aws ecr delete-repository \
                   --repository-name ${APP_REPO_NAME} \
                   --region ${AWS_REGION}\
                   --force
-                """
+            """
+
             echo 'Tear down the Kubernetes Cluster'
             sh """
             cd infrastructure/create-kube-cluster
             terraform destroy -auto-approve -no-color
-            rm -rf .terraform
-            rm -rf .terraform.lock.hcl
-            rm -rf terraform.tfstate
-            rm -rf terraform.tfstate.backup
             """
             echo "Delete existing key pair using AWS CLI"
             sh "aws ec2 delete-key-pair --region ${AWS_REGION} --key-name ${ANS_KEYPAIR}"
-            sh "rm -rf ${ANS_KEYPAIR}.pem"
-         
-
+            sh "rm -rf ${ANS_KEYPAIR}.pem"            
         }
+
+        success {
+            mail bcc: '', body: 'Congrats !!! CICD Pipeline is successfull.', cc: '', from: '', replyTo: '', subject: 'Test Mail', to: 'yakin68@gmail.com'
+        }        
     }
 }
