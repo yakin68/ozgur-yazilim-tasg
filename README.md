@@ -946,6 +946,8 @@ The `post` section in a Jenkins pipeline defines actions that should be taken af
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 ## STEP 17 -  Send to mail success
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+* Add a 'success' step under the post to send an email if the project is successful.
 ```
         success {
             mail bcc: '', body: 'Congrats !!! CICD Pipeline is successfull.', cc: '', from: '', replyTo: '', subject: 'Test Mail', to: 'yakin68@gmail.com'
