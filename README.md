@@ -5,9 +5,9 @@
 This project aims to create full CI/CD Pipeline for microservice based applications using Microservices Application. Jenkins Server deployed on Elastic Compute Cloud (EC2) Instance is used as CI/CD Server to build pipelines. 
 
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # #
 ##  STEP 1 - Prepair GitHub Repository for your proje 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 * create a private repo named ozgur-yzl-tasg. No readme.md.
 
@@ -39,9 +39,9 @@ git push origin main
 * Do not push the token to github and do not share it with anyone. *This command is used to add a remote repository to a Git repository. In the relevant example, a remote repository is added with the git remote add command. The name origin is usually used by default for the main remote repository. You specify your GitHub username in the [github username] section, your GitHub account's access token in the [your-token] section, and the repository address you want to add in the yakin68/ozguryzl-tasg.git section. If you use this command, you specify your GitHub username and If you insert your access token correctly, you will link a local Git repository to the remote repository "yakin68/ozgur-yzl-tasg" on GitHub. This allows you to push the changes you made locally to this remote repository and pull them from the remote repository to the local repository.
 
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # #
 ##  STEP 2 - Install jenkins-server for automation infrastructure
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 * Create a folder for ansible jobs under the `main` folder.
   
@@ -260,9 +260,9 @@ variable "jenkins-role" {}
 
 * Search and select GitHub Integration, Docker, Docker Pipeline, Email Extension plugins, then click Install without restart. Note: No need to install the other Git plugin which is already installed can be seen under Installed tab.
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # #
 ##  STEP 3 - Run App locally
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 * Before preparing the microservice architecture, it is a best-practice method to manually check whether it works or not. 
 * Spring Petclinic is a Spring Boot application built using Maven or Gradle. You can build a jar file and run it from the command line (it should work just as well with Java 17 or newer):
@@ -276,9 +276,9 @@ java -jar target/*.jar
 * When we examine readme.md in the [Spring Petclinic Microservices Application] repo, you will be able to get images with https://localhost:8080. You need to get the localhost here, the EC2 instance public ip that we set up for Jenkins-server. 
   
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # #
 ## STEP 4 - Prepare Dockerfiles for Microservices 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 * Prepare a Dockerfile file in the main directory.
 
@@ -291,9 +291,9 @@ EXPOSE 8080
 ENTRYPOINT ["java", "-Djava.security.egd=file:/dev/./urandom","-jar","/app.jar"]
 ```
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # #
 ## STEP 5 -Prepare Automation Pipeline [environment]
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 * Prepare environment, S3 bucket for HELM , Ansible, Create ECR Repo for store, manage, and distribute Docker container images and save it as `jenkinsfile` file under jenkins folder.
 
@@ -308,9 +308,9 @@ ANSIBLE_PRIVATE_KEY_FILE="${WORKSPACE}/${ANS_KEYPAIR}.pem"
 ANSIBLE_HOST_KEY_CHECKING="False"
 ```
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # #
 ## STEP 6 -Prepare Automation Pipeline [Check S3 Bucket]
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 * Create an S3 bucket for Helm charts. In the bucket, create a folder called stable/myapp. The example in this pattern uses s3://${APP_NAME}-helm-charts-/stable/myapp as the target chart repository.
 
@@ -321,9 +321,9 @@ sh 'aws s3api create-bucket --bucket ${APP_NAME}-helm-charts-repo --region us-ea
 sh 'aws s3api put-object --bucket ${APP_NAME}-helm-charts-repo --key stable/myapp/'
 ```
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # #
 ## STEP 7 -Prepare Automation Pipeline [Create Docker Registry for on AWS ECR ]
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 * Prepare a stage to create Docker Registry for on AWS ECR 
     
@@ -336,9 +336,9 @@ aws ecr create-repository \
 --region ${AWS_REGION}
 ```
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # #
 ## STEP 8 -Prepare Continuous Integration (CI) Pipeline [build,push and tags for docker images]
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 * Create a folder, named jenkins, to keep and Jenkins jobs of the project.
 * Prepare a script to ``package`` the app with maven Docker container and save it as `package-with-maven-container.sh` and save it under `jenkins` folder.
@@ -381,9 +381,9 @@ docker push "${IMAGE_TAG_OZGURYZL}"
 chmod +x push-prod-docker-images-to-ecr.sh
 ```
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # #
 ## STEP 9 - Prepare Automation Pipeline [Create Helm chart]
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 * Create an helm chart named `ozguryzl_chart` under `k8s` folder.
   
@@ -546,9 +546,9 @@ stringData:
   MYSQL_ROOT_PASSWORD: root
   MYSQL_PASSWORD: petclinic
 ```
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # #
 ## STEP 10 - Prepare to connect mysql for Kubernetes Cluster
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 * See application features documentation
 ```bash
@@ -556,9 +556,9 @@ cd /src/main/resources/
 sed -i "s/localdost/mysql-server/g" application-mysql.properties
 ```
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # #
 ## STEP 11 - Set up a Helm v3 chart repository in Amazon S3
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 * This pattern helps you to manage Helm v3 charts efficiently by integrating the Helm v3 repository into Amazon Simple Storage Service (Amazon S3) on the Amazon Web Services (AWS) Cloud. (https://docs.aws.amazon.com/prescriptive-guidance/latest/patterns/set-up-a-helm-v3-chart-repository-in-amazon-s3.html)
 
@@ -590,9 +590,9 @@ helm package k8s/ozguryzl_chart
 helm s3 push --force ozguryzl_chart-${BUILD_NUMBER}.tgz stable-${APP_NAME}
 ```
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # #
 ## STEP 12 - Create Key Pair for Ansible
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 * Prepair to stage to create key pair for Ansible
 
@@ -601,9 +601,9 @@ aws ec2 create-key-pair --region ${AWS_REGION} --key-name ${ANS_KEYPAIR} --query
 chmod 400 ${ANS_KEYPAIR}.pem"
 ```
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # #
 ## STEP 13 - Create Infrastructure Kubernetes Cluster with Terraform
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 * Create a folder for ansible jobs under the `main` folder.
 ```bash
@@ -798,9 +798,9 @@ env.id = sh(script: 'aws ec2 describe-instances --filters Name=tag-value,Values=
 aws ec2 wait instance-status-ok --instance-ids $id
 ```
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # #
 ## STEP 14 - Prepare Automation Pipeline [Create Ansible jobs]
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # #
 * Create a folder for ansible jobs under the `main` folder.
 
 ```bash
@@ -868,9 +868,9 @@ sleep 60
 ansible-playbook -i ./ansible/inventory/dynamic_inventory_aws_ec2.yaml ./ansible/playbooks/dev-ozguryzl-deploy.yaml
 ```
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # #
 ## STEP 15 - Take a standby step
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 * Take a standby step to examine the infrastructure, develop the application and secure it.
 
@@ -883,9 +883,9 @@ ansible-playbook -i ./ansible/inventory/dynamic_inventory_aws_ec2.yaml ./ansible
         }  
 ```           
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # #
 ## STEP 16 - Deleting all local images and Destroy the infrastructure
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 * 
 The `post` section in a Jenkins pipeline defines actions that should be taken after the main build steps have completed. 
@@ -918,9 +918,9 @@ The `post` section in a Jenkins pipeline defines actions that should be taken af
     }    
 ```
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # #
 ## STEP 17 -  Send to mail success
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 * Add a 'success' step under the post to send an email if the project is successful.
 ```
@@ -929,9 +929,9 @@ The `post` section in a Jenkins pipeline defines actions that should be taken af
             }
 ```
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # #
 ## STEP 18 - Prepair NGINX Reverse Proxy for www.devopsproje.online
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 * Connect to kube-master server via ssh or AWS dashboard
 * The first step is to install NGINX on our system. If you are using a Linux-based system, you can usually install NGINX through your package manager
@@ -983,9 +983,9 @@ sudo systemctl restart nginx
 
 ```
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # #
 ## STEP 19 - Prepair NGINX Reverse Proxy for jenkins server
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 * Connect to jenkins server via ssh or AWS dashboard
 * The first step is to install NGINX on our system. If you are using a Linux-based system, you can usually install NGINX through your package manager
@@ -1022,9 +1022,9 @@ sudo systemctl restart nginx
 
 ```
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # #
 ## STEP 20 - Enable SSL in Jenkins Server -Setting Domain Name and TLS for Production Pipeline with Route 53
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 * Cloudflare provides SSL support and is generally a preferred solution by users. Cloudflare offers advanced features for SSL/TLS encryption and security for your website. Some advantages of Cloudflare include: 1. Free SSL Certificates: Cloudflare provides free SSL/TLS certificates to encrypt your website traffic. This ensures a secure connection by enabling your website to use the HTTPS protocol.
 
@@ -1036,9 +1036,9 @@ sudo systemctl restart nginx
 
 * You can try different solutions, for example, you can create your own password with openssl and get 90-day free SSL certificates from https://app.zerossl.com/dashboard.
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # #
 ## STEP 21 - Prepair github token after this proje 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 * GitHub token is an authentication mechanism used to access GitHub's API (Application Programming Interface) on behalf of a user or a GitHub application. Tokens are typically used for automation, such as when integrating GitHub with other services or when performing repetitive tasks programmatically.
 
