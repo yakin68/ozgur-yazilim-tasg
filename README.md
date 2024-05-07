@@ -404,7 +404,6 @@ rm -r ozguryzl_chart/templates/*
 
 ```
 IMAGE_TAG_OZGURYZL: "${IMAGE_TAG_OZGURYZL}"
-DNS_NAME: "www.devopsproje.online"
 ```
 * Create yaml files under 'ozguryzl_chart/templates/' folder for keeping the manifest files of Petclinic App on Kubernetes cluster.
 
@@ -546,30 +545,6 @@ metadata:
 stringData:
   MYSQL_ROOT_PASSWORD: root
   MYSQL_PASSWORD: petclinic
-```
-
-* Create yaml file for ingress.yml
-```yaml 
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: api-gateway
-  namespace: ozguryzl-dev
-spec:
-  ingressClassName: nginx
-  rules:
-    - host: '{{ .Values.DNS_NAME }}'
-      http:
-        paths:
-        - pathType: Prefix
-          path: /
-          backend:
-            service:
-              name: ozguryzl-service
-              port:
-                number: 8080
-status:
-  loadBalancer: {}
 ```
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 ## STEP 10 - Prepare to connect mysql for Kubernetes Cluster
