@@ -918,11 +918,16 @@ The `post` section in a Jenkins pipeline defines actions that should be taken af
     }    
 ```
 
+* You will be able to get images with http://localhost:30001. You need to get the localhost here, the EC2 instance public ip that we set up for kube-master server.
+* 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-## STEP 17 -  Send to mail success
+## STEP 17 -  Send to mail success 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
+* Before doing this follow step-22 and make necessary adjustments
+  
 * Add a 'success' step under the post to send an email if the project is successful.
+  
 ```
         success {
             mail bcc: '', body: 'Congrats !!! CICD Pipeline is successfull.', cc: '', from: '', replyTo: '', subject: 'Test Mail', to: 'yakin68@gmail.com'
