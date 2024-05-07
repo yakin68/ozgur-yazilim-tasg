@@ -946,6 +946,8 @@ sudo rm -rf /etc/nginx/sites-available/default
 sudo nano /etc/nginx/sites-available/default
 ```
 * Add a Short Proxy Definition: Add the main server definition that will receive requests to the NGINX configuration file. In this definition, we will redirect incoming requests to a specific server or application.
+
+* Use 'http' instead of 'https', it was used this way due to an error in the jenkins pipeline. 
 ```
  server {
     listen 80;
